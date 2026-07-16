@@ -1,191 +1,355 @@
-import { motion } from 'framer-motion'
-import { useNavigate } from 'react-router-dom'
-import { TrendingUp, Users, Award, AlertTriangle, ArrowRight, BarChart3, Activity, GraduationCap, BookOpen, Target, Building2, Phone, Mail, MapPin } from 'lucide-react'
-import { useState, useEffect } from 'react'
-
-const quotes = [
-  "Engineering your future with excellence",
-  "Time to learn, Moment to Celebrate",
-  "Inspiring Faculty, World Class Facility",
-  "A place for learning, discovery, innovation",
-]
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import {
+  GraduationCap, Users, BookOpen, Award, Upload, BarChart3, Brain,
+  Building2, Microscope, Cpu, Landmark, Heart, ArrowRight, Star,
+  Phone, Mail, MapPin, Globe, ChevronRight, TrendingUp, Target,
+  Sparkles, Rocket, Shield, Zap, Library, Bus, Home as HomeIcon,
+  Trophy, Medal, Flame, ShieldCheck, BookMarked, Presentation,
+  MonitorPlay, Wifi, Dumbbell, TreePine, Coffee
+} from 'lucide-react';
 
 const departments = [
-  { name: "CSE", full: "Computer Science & Engineering", students: 120 },
-  { name: "IT", full: "Information Technology", students: 60 },
-  { name: "ECE", full: "Electronics & Communication", students: 60 },
-  { name: "EEE", full: "Electrical & Electronics", students: 60 },
-  { name: "CIVIL", full: "Civil Engineering", students: 60 },
-  { name: "MECH", full: "Mechanical Engineering", students: 60 },
-  { name: "AIDS", full: "AI & Data Science", students: 60 },
-  { name: "AIML", full: "AI & Machine Learning", students: 60 },
-  { name: "CYBER", full: "Cyber Security", students: 40 },
-  { name: "FASHION", full: "Fashion Technology", students: 40 },
-]
+  { name: 'Computer Science & Engineering', short: 'CSE', icon: Cpu, color: 'from-blue-500 to-indigo-600' },
+  { name: 'Information Technology', short: 'IT', icon: MonitorPlay, color: 'from-purple-500 to-pink-600' },
+  { name: 'Electronics & Communication', short: 'ECE', icon: Zap, color: 'from-cyan-500 to-blue-600' },
+  { name: 'Electrical & Electronics', short: 'EEE', icon: Landmark, color: 'from-yellow-500 to-orange-600' },
+  { name: 'Civil Engineering', short: 'CIVIL', icon: Building2, color: 'from-green-500 to-emerald-600' },
+  { name: 'Mechanical Engineering', short: 'MECH', icon: Microscope, color: 'from-red-500 to-rose-600' },
+  { name: 'AI & Data Science', short: 'AIDS', icon: Brain, color: 'from-violet-500 to-purple-600' },
+  { name: 'AI & Machine Learning', short: 'AIML', icon: Sparkles, color: 'from-pink-500 to-rose-600' },
+  { name: 'Cyber Security', short: 'CYBER', icon: Shield, color: 'from-teal-500 to-cyan-600' },
+  { name: 'Fashion Technology', short: 'FASHION', icon: Star, color: 'from-amber-500 to-orange-600' },
+];
 
 const facilities = [
-  { icon: "📚", title: "Library", desc: "Excellent library for students and faculty" },
-  { icon: "🚌", title: "Transport", desc: "Buses reach campus before 8:05 AM daily" },
-  { icon: "🏠", title: "Hostel", desc: "Separate hostels for boys and girls" },
-  { icon: "🏆", title: "Sports", desc: "Best sports facilities and coaches" },
-]
+  { icon: Library, name: 'Central Library', desc: 'Over 50,000 volumes, digital archives, and e-journal access' },
+  { icon: Bus, name: 'Transport', desc: 'Fleet of 30+ buses covering all routes across Chennai' },
+  { icon: HomeIcon, name: 'Hostel', desc: 'Separate hostels for men and women with modern amenities' },
+  { icon: Dumbbell, name: 'Sports Complex', desc: 'Indoor and outdoor sports with Olympic-size swimming pool' },
+  { icon: Wifi, name: 'Campus Wi-Fi', desc: 'High-speed internet across entire campus with 1Gbps backbone' },
+  { icon: Coffee, name: 'Cafeteria', desc: 'Multi-cuisine food court serving 1000+ students daily' },
+  { icon: TreePine, name: 'Green Campus', desc: 'Eco-friendly campus with solar panels and rainwater harvesting' },
+  { icon: ShieldCheck, name: '24/7 Security', desc: 'CCTV surveillance and security personnel around the clock' },
+];
 
-const recruiters = ["TCS", "Infosys", "Cognizant", "Wipro", "IBM", "Mahindra"]
+const recruiters = [
+  'TCS', 'Infosys', 'Wipro', 'Cognizant', 'HCL Technologies',
+  'Tech Mahindra', 'IBM', 'Accenture', 'Capgemini', 'L&T Technology',
+  'Mindtree', 'Mphasis', 'Hexaware', 'Zoho', 'Freshworks'
+];
 
-function TypingText() {
-  const [idx, setIdx] = useState(0)
-  const [text, setText] = useState('')
-  const [del, setDel] = useState(false)
+const stats = [
+  { label: 'Departments', value: '10', icon: BookOpen },
+  { label: 'Academic Years', value: '4', icon: GraduationCap },
+  { label: 'Students', value: '620+', icon: Users },
+  { label: 'Success Rate', value: '94%', icon: Award },
+];
 
-  useEffect(() => {
-    const current = quotes[idx]
-    const timeout = setTimeout(() => {
-      if (!del) {
-        setText(current.substring(0, text.length + 1))
-        if (text.length === current.length) setTimeout(() => setDel(true), 2500)
-      } else {
-        setText(current.substring(0, text.length - 1))
-        if (text.length === 0) { setDel(false); setIdx((i) => (i + 1) % quotes.length) }
-      }
-    }, del ? 40 : 80)
-    return () => clearTimeout(timeout)
-  }, [text, del, idx])
+const container = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { staggerChildren: 0.08 } }
+};
+const item = {
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } }
+};
 
-  return <span>{text}<span className="text-indigo animate-pulse">|</span></span>
-}
-
-const card = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }
+const quotes = [
+  'Education is the passport to the future, for tomorrow belongs to those who prepare for it today.',
+  'The beautiful thing about learning is that nobody can take it away from you.',
+  'Success is not final, failure is not fatal: it is the courage to continue that counts.',
+  'The only way to do great work is to love what you do.',
+];
 
 export default function Home() {
-  const navigate = useNavigate()
+  const [quoteIdx, setQuoteIdx] = useState(0);
+  const [displayText, setDisplayText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const current = quotes[quoteIdx];
+    let timeout;
+    if (!isDeleting && displayText.length < current.length) {
+      timeout = setTimeout(() => setDisplayText(current.slice(0, displayText.length + 1)), 40);
+    } else if (!isDeleting && displayText.length === current.length) {
+      timeout = setTimeout(() => setIsDeleting(true), 3000);
+    } else if (isDeleting && displayText.length > 0) {
+      timeout = setTimeout(() => setDisplayText(displayText.slice(0, -1)), 20);
+    } else if (isDeleting && displayText.length === 0) {
+      setIsDeleting(false);
+      setQuoteIdx((prev) => (prev + 1) % quotes.length);
+    }
+    return () => clearTimeout(timeout);
+  }, [displayText, isDeleting, quoteIdx]);
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: 0.08 } } }} className="flex flex-col gap-5">
+    <div className="min-h-screen flex flex-col items-center">
+      {/* Hero */}
+      <motion.section
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-5xl mx-auto text-center py-16 px-4"
+      >
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
+          className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/20 text-white text-sm font-medium mb-8 backdrop-blur-sm"
+        >
+          <GraduationCap size={18} />
+          <span>SRI KRISHNA ENGINEERING COLLEGE</span>
+          <GraduationCap size={18} />
+        </motion.div>
 
-      {/* Topbar */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-sora text-[22px] font-semibold text-text-hi">SRI KRISHNA ENGINEERING COLLEGE</h1>
-          <p className="text-[13px] text-text-mid mt-1">& SRI KRISHNA INSTITUTE OF TECHNOLOGY — <TypingText /></p>
-        </div>
-        <div className="flex items-center gap-3 text-[12px] text-text-low">
-          <span className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" />+91 81108 61000</span>
-          <span className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5" />principal.skec@gmail.com</span>
-        </div>
-      </div>
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+          className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-white mb-6 leading-tight"
+        >
+          Student Analyser
+          <br />
+          <span className="bg-gradient-to-r from-yellow-200 via-pink-200 to-cyan-200 bg-clip-text text-transparent">
+            Dashboard
+          </span>
+        </motion.h1>
 
-      {/* Stat Cards */}
-      <motion.div variants={card} className="grid grid-cols-4 gap-4">
-        {[
-          { label: "DEPARTMENTS", value: "10", delta: "+2 new", up: true, color: "text-indigo" },
-          { label: "ACADEMIC YEARS", value: "4", delta: "B.E / B.Tech", up: true, color: "text-amber" },
-          { label: "TOTAL STUDENTS", value: "620+", delta: "All departments", up: true, color: "text-green" },
-          { label: "SUCCESS RATE", value: "94%", delta: "↑ 3.1% vs last", up: true, color: "text-green" },
-        ].map((s, i) => (
-          <motion.div key={i} variants={card} whileHover={{ borderColor: "rgba(129,140,248,0.35)", y: -2 }}
-            className="glass p-5 flex flex-col gap-2 transition-all duration-200 cursor-pointer">
-            <span className="text-[11.5px] text-text-mid uppercase tracking-[0.06em] font-medium">{s.label}</span>
-            <span className={`font-mono text-[28px] font-bold ${s.color}`}>{s.value}</span>
-            <span className={`text-[11.5px] font-medium ${s.up ? 'text-green' : 'text-rose'}`}>{s.delta}</span>
-          </motion.div>
-        ))}
-      </motion.div>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto mb-4 font-light"
+        >
+          Powered by AI — Analyse academic performance, track student progress,
+          and make data-driven decisions for academic excellence.
+        </motion.p>
 
-      {/* Quick Actions */}
-      <motion.div variants={card} className="grid grid-cols-3 gap-4">
-        {[
-          { icon: Building2, title: "Student Management", desc: "Track student data across all departments", action: () => navigate('/department'), color: "from-indigo/20 to-indigo-deep/20" },
-          { icon: BarChart3, title: "Performance Analytics", desc: "AI-powered academic progress insights", action: () => navigate('/analytics'), color: "from-amber/20 to-orange-500/20" },
-          { icon: Award, title: "Grade Analysis", desc: "Comprehensive marks evaluation system", action: () => navigate('/upload'), color: "from-green/20 to-emerald-500/20" },
-        ].map((item, i) => (
-          <motion.div key={i} variants={card} whileHover={{ borderColor: "rgba(129,140,248,0.35)", y: -3 }}
-            className="glass p-6 cursor-pointer transition-all duration-200 group" onClick={item.action}>
-            <div className={`w-12 h-12 rounded-[12px] bg-gradient-to-br ${item.color} flex items-center justify-center mb-4`}>
-              <item.icon className="w-6 h-6 text-indigo" />
-            </div>
-            <h3 className="font-sora text-[15px] font-semibold text-text-hi mb-1.5">{item.title}</h3>
-            <p className="text-[13px] text-text-mid leading-relaxed">{item.desc}</p>
-            <div className="flex items-center gap-1.5 text-[12px] text-indigo mt-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-              Open <ArrowRight className="w-3.5 h-3.5" />
-            </div>
-          </motion.div>
-        ))}
-      </motion.div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className="flex items-center justify-center gap-6 text-white/70 text-sm mb-6 flex-wrap"
+        >
+          <span className="flex items-center gap-1.5"><Phone size={14} /> +91 81108 61000</span>
+          <span className="flex items-center gap-1.5"><Mail size={14} /> principal.skec@gmail.com</span>
+          <span className="flex items-center gap-1.5"><MapPin size={14} /> Panapakkam, Chennai</span>
+        </motion.div>
 
-      {/* Departments Grid */}
-      <motion.div variants={card} className="glass p-6">
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="font-sora text-[15px] font-semibold text-text-hi">Departments</h2>
-          <span className="text-[11.5px] text-text-low">Anna University Affiliated</span>
-        </div>
-        <div className="grid grid-cols-5 gap-3">
-          {departments.map((dept, i) => (
-            <motion.div key={i} variants={card} whileHover={{ borderColor: "rgba(129,140,248,0.35)", y: -2 }}
-              className="glass p-3 text-center cursor-pointer transition-all duration-200 rounded-[14px]">
-              <div className="w-10 h-10 rounded-[10px] bg-gradient-to-br from-indigo/20 to-indigo-deep/20 flex items-center justify-center mx-auto mb-2">
-                <span className="text-[11px] font-bold text-indigo font-mono">{dept.name}</span>
-              </div>
-              <div className="text-[11px] font-medium text-text-hi leading-tight">{dept.name}</div>
-              <div className="text-[10px] text-text-low mt-1">{dept.students} students</div>
+        {/* Typewriter Quote */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7 }}
+          className="glass rounded-2xl p-6 max-w-2xl mx-auto mb-10"
+        >
+          <p className="text-white/90 text-base sm:text-lg italic min-h-[28px]">
+            "{displayText}<span className="animate-pulse">|</span>"
+          </p>
+        </motion.div>
+
+        {/* Stats */}
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto mb-12"
+        >
+          {stats.map((stat) => {
+            const Icon = stat.icon;
+            return (
+              <motion.div
+                key={stat.label}
+                variants={item}
+                className="glass-card p-5 text-center hover:scale-105 transition-transform duration-300"
+              >
+                <Icon className="mx-auto mb-2 text-indigo-600" size={28} />
+                <p className="text-3xl font-extrabold text-gray-900">{stat.value}</p>
+                <p className="text-sm text-gray-500 mt-1">{stat.label}</p>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+
+        {/* Action Cards */}
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12"
+        >
+          {[
+            { icon: Users, title: 'Student Management', desc: 'Track enrollment, attendance, and academic records for all 620+ students across 10 departments and 4 academic years.', color: 'from-blue-500 to-indigo-600', link: '/department' },
+            { icon: BarChart3, title: 'Performance Analytics', desc: 'AI-powered analytics with interactive charts, trend analysis, and predictive insights to identify at-risk students early.', color: 'from-purple-500 to-pink-600', link: '/analytics' },
+            { icon: Brain, title: 'AI Grade Analysis', desc: 'Upload student marks via Excel or text files and let our AI engine generate comprehensive grade distributions and reports.', color: 'from-cyan-500 to-blue-600', link: '/upload' },
+          ].map((card, i) => {
+            const Icon = card.icon;
+            return (
+              <motion.div key={i} variants={item}>
+                <Link to={card.link} className="block glass-card p-8 text-center hover:scale-[1.03] transition-all duration-300 group h-full">
+                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${card.color} flex items-center justify-center mx-auto mb-5 shadow-lg group-hover:scale-110 transition-transform`}>
+                    <Icon className="text-white" size={30} />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">{card.title}</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed mb-4">{card.desc}</p>
+                  <span className="inline-flex items-center gap-1 text-indigo-600 text-sm font-semibold group-hover:gap-2 transition-all">
+                    Explore <ArrowRight size={14} />
+                  </span>
+                </Link>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      </motion.section>
+
+      {/* Departments */}
+      <section className="w-full max-w-6xl mx-auto px-4 mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-10"
+        >
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">Our Departments</h2>
+          <p className="text-white/70 text-base max-w-xl mx-auto">10 specialized departments offering cutting-edge engineering and technology programs</p>
+        </motion.div>
+        <motion.div
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4"
+        >
+          {departments.map((dept) => {
+            const Icon = dept.icon;
+            return (
+              <motion.div
+                key={dept.short}
+                variants={item}
+                whileHover={{ scale: 1.05, y: -5 }}
+                className="glass-card p-5 text-center cursor-pointer"
+              >
+                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${dept.color} flex items-center justify-center mx-auto mb-3 shadow-md`}>
+                  <Icon className="text-white" size={22} />
+                </div>
+                <p className="font-bold text-gray-900 text-sm">{dept.short}</p>
+                <p className="text-xs text-gray-500 mt-1 leading-snug">{dept.name}</p>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      </section>
+
+      {/* Facilities */}
+      <section className="w-full max-w-6xl mx-auto px-4 mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-10"
+        >
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">Campus Facilities</h2>
+          <p className="text-white/70 text-base max-w-xl mx-auto">World-class infrastructure to support holistic development of students</p>
+        </motion.div>
+        <motion.div
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4"
+        >
+          {facilities.map((f, i) => {
+            const Icon = f.icon;
+            return (
+              <motion.div
+                key={i}
+                variants={item}
+                whileHover={{ scale: 1.03 }}
+                className="glass-card p-6 text-center"
+              >
+                <Icon className="mx-auto mb-3 text-indigo-600" size={32} />
+                <h4 className="font-bold text-gray-900 mb-2">{f.name}</h4>
+                <p className="text-sm text-gray-600 leading-relaxed">{f.desc}</p>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      </section>
+
+      {/* Recruiters */}
+      <section className="w-full max-w-5xl mx-auto px-4 mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-8"
+        >
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">Our Recruiters</h2>
+          <p className="text-white/70 text-base max-w-xl mx-auto">Top companies that recruit from SRI KRISHNA ENGINEERING COLLEGE</p>
+        </motion.div>
+        <motion.div
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+          className="flex flex-wrap justify-center gap-3"
+        >
+          {recruiters.map((r, i) => (
+            <motion.div
+              key={i}
+              variants={item}
+              className="glass-card px-5 py-3 text-sm font-semibold text-gray-700 hover:scale-105 transition-transform"
+            >
+              {r}
             </motion.div>
           ))}
-        </div>
-      </motion.div>
-
-      {/* Bottom Row */}
-      <div className="grid grid-cols-2 gap-4">
-        {/* Facilities */}
-        <motion.div variants={card} className="glass p-6">
-          <h2 className="font-sora text-[15px] font-semibold text-text-hi mb-4">Campus Facilities</h2>
-          <div className="grid grid-cols-2 gap-3">
-            {facilities.map((f, i) => (
-              <div key={i} className="flex items-start gap-3 p-3 rounded-[12px] hover:bg-white/[0.03] transition-colors">
-                <span className="text-[20px]">{f.icon}</span>
-                <div>
-                  <div className="text-[13px] font-medium text-text-hi">{f.title}</div>
-                  <div className="text-[11px] text-text-low mt-0.5">{f.desc}</div>
-                </div>
-              </div>
-            ))}
-          </div>
         </motion.div>
+      </section>
 
-        {/* Recruiters */}
-        <motion.div variants={card} className="glass p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-sora text-[15px] font-semibold text-text-hi">Industry Partners</h2>
-            <span className="text-[10.5px] font-semibold px-2.5 py-1 rounded-full bg-green/10 text-green border border-green/25">Top Recruiters</span>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {recruiters.map((r, i) => (
-              <span key={i} className="px-4 py-2 glass text-[13px] font-medium text-text-mid rounded-[10px] hover:text-text-hi hover:border-[rgba(129,140,248,0.35)] transition-all cursor-pointer">
-                {r}
-              </span>
-            ))}
-          </div>
-          <div className="mt-4 pt-4 border-t border-white/[0.06]">
-            <div className="flex items-center gap-2 text-[12px] text-text-low">
-              <MapPin className="w-3.5 h-3.5" />
-              Panapakkam, Near Padappai, Via - Tambaram, Chennai - 601 301
-            </div>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Get Started CTA */}
-      <motion.div variants={card} className="glass p-8 text-center">
-        <h2 className="font-sora text-[20px] font-semibold text-text-hi mb-2">Start Analyzing Student Performance</h2>
-        <p className="text-[13px] text-text-mid mb-5">Upload marks data and get AI-powered insights instantly</p>
-        <motion.button
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={() => navigate('/department')}
-          className="px-8 py-3 rounded-[12px] font-sora font-semibold text-[14px] text-white transition-all duration-200"
-          style={{ background: 'linear-gradient(135deg, #818cf8, #4f46e5)', boxShadow: '0 0 0 1px rgba(129,140,248,0.4), 0 8px 24px rgba(79,70,229,0.35)' }}
+      {/* CTA */}
+      <section className="w-full max-w-4xl mx-auto px-4 mb-16">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          className="glass-card p-10 text-center"
         >
-          Get Started <ArrowRight className="w-4 h-4 inline ml-1.5" />
-        </motion.button>
-      </motion.div>
-    </motion.div>
-  )
+          <Rocket className="mx-auto mb-4 text-indigo-600" size={40} />
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Ready to Analyse Student Performance?</h2>
+          <p className="text-gray-600 mb-6 max-w-lg mx-auto leading-relaxed">
+            Upload your class marks and let our AI-powered system generate detailed analytics,
+            performance insights, and predictive reports to help every student succeed.
+          </p>
+          <Link
+            to="/upload"
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+          >
+            <Upload size={18} />
+            Get Started Now
+          </Link>
+        </motion.div>
+      </section>
+
+      {/* Footer */}
+      <footer className="w-full glass py-8 text-center">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">SA</div>
+            <span className="text-white font-bold">Student Analyser Dashboard</span>
+          </div>
+          <p className="text-white/60 text-sm mb-2">SRI KRISHNA ENGINEERING COLLEGE</p>
+          <p className="text-white/50 text-xs">
+            Counselling Code: 1427 | Panapakkam, Chennai - 601 301 | +91 81108 61000 | principal.skec@gmail.com
+          </p>
+          <div className="flex items-center justify-center gap-4 mt-4 text-white/50 text-xs">
+            <span className="flex items-center gap-1"><Globe size={12} /> skec.edu.in</span>
+            <span>|</span>
+            <span>© 2025 SKEC. All rights reserved.</span>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
 }

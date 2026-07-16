@@ -1,283 +1,458 @@
-import { useState, useEffect, useMemo } from 'react'
-import { motion } from 'framer-motion'
-import { useNavigate } from 'react-router-dom'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts'
-import { Brain, TrendingUp, Award, Users, AlertTriangle, CheckCircle, ArrowLeft, Sparkles, BarChart3, Activity } from 'lucide-react'
+import React, { useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
+import { useLocation, Link } from 'react-router-dom';
+import {
+  PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid,
+  PolarAngleAxis, PolarRadiusAxis, LineChart, Line, AreaChart, Area
+} from 'recharts';
+import {
+  Brain, TrendingUp, AlertTriangle, Award, Users, BookOpen,
+  ArrowUpRight, ArrowDownRight, Minus, Trophy, Medal, Flame,
+  Download, ChevronLeft, BarChart3
+} from 'lucide-react';
 
-const COLORS = ['#818cf8', '#f87171', '#fbbf24', '#34d399', '#22d3ee', '#a78bfa', '#f472b6']
-const departmentNames = {
-  cse: 'Computer Science & Engineering', it: 'Information Technology', ece: 'Electronics & Communication',
-  eee: 'Electrical & Electronics', civil: 'Civil Engineering', mech: 'Mechanical Engineering',
-  aids: 'AI & Data Science', aiml: 'AI & Machine Learning', cyber: 'Cyber Security', fashion: 'Fashion Technology',
-}
+const COLORS = ['#6366f1', '#ec4899', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#f97316', '#14b8a6', '#e11d48'];
 
-const card = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }
+const defaultData = [
+  { 'Roll No': 'CSE001', 'Name': 'Arun Kumar', 'Maths': 85, 'Physics': 78, 'Chemistry': 90, 'English': 88, 'CS Fundamentals': 92 },
+  { 'Roll No': 'CSE002', 'Name': 'Priya Devi', 'Maths': 92, 'Physics': 85, 'Chemistry': 88, 'English': 95, 'CS Fundamentals': 96 },
+  { 'Roll No': 'CSE003', 'Name': 'Ravi Shankar', 'Maths': 65, 'Physics': 58, 'Chemistry': 72, 'English': 70, 'CS Fundamentals': 68 },
+  { 'Roll No': 'CSE004', 'Name': 'Lakshmi Priya', 'Maths': 78, 'Physics': 82, 'Chemistry': 75, 'English': 80, 'CS Fundamentals': 85 },
+  { 'Roll No': 'CSE005', 'Name': 'Karthik Raj', 'Maths': 55, 'Physics': 48, 'Chemistry': 62, 'English': 65, 'CS Fundamentals': 58 },
+  { 'Roll No': 'CSE006', 'Name': 'Deepa Nair', 'Maths': 95, 'Physics': 92, 'Chemistry': 94, 'English': 90, 'CS Fundamentals': 98 },
+  { 'Roll No': 'CSE007', 'Name': 'Suresh Babu', 'Maths': 42, 'Physics': 38, 'Chemistry': 55, 'English': 45, 'CS Fundamentals': 40 },
+  { 'Roll No': 'CSE008', 'Name': 'Anitha S', 'Maths': 88, 'Physics': 75, 'Chemistry': 82, 'English': 85, 'CS Fundamentals': 90 },
+  { 'Roll No': 'CSE009', 'Name': 'Mohan Prasad', 'Maths': 70, 'Physics': 65, 'Chemistry': 68, 'English': 72, 'CS Fundamentals': 74 },
+  { 'Roll No': 'CSE010', 'Name': 'Vidya Lakshmi', 'Maths': 82, 'Physics': 88, 'Chemistry': 80, 'English': 86, 'CS Fundamentals': 88 },
+];
 
 export default function Analytics() {
-  const navigate = useNavigate()
-  const [studentData, setStudentData] = useState([])
-  const [department, setDepartment] = useState('')
-  const [year, setYear] = useState('')
-  const [aiInsights, setAiInsights] = useState([])
+  const location = useLocation();
+  const dept = location.state?.department || 'CSE';
+  const year = location.state?.year || '3rd Year';
+  const rawData = location.state?.studentData || defaultData;
 
-  useEffect(() => {
-    const data = sessionStorage.getItem('studentData')
-    if (data) { setStudentData(JSON.parse(data)); setDepartment(sessionStorage.getItem('department') || ''); setYear(sessionStorage.getItem('year') || '') }
-  }, [])
+  const subjectCols = useMemo(() => {
+    if (!rawData || rawData.length === 0) return [];
+    return Object.keys(rawData[0]).filter(k => k !== 'Roll No' && k !== 'Name' && k !== 'Roll' && !k.toLowerCase().includes('name') && !k.toLowerCase().includes('roll'));
+  }, [rawData]);
 
-  const analytics = useMemo(() => {
-    if (studentData.length === 0) return null
-    const swa = studentData.map(s => ({ ...s, average: s.marks.length > 0 ? s.marks.reduce((a,b)=>a+b,0)/s.marks.length : 0 }))
-    const allAvg = swa.map(s => s.average).filter(a => a > 0)
-    const overallAvg = allAvg.length > 0 ? allAvg.reduce((a,b)=>a+b,0)/allAvg.length : 0
-    const passRate = allAvg.length > 0 ? (allAvg.filter(a => a >= 40).length / allAvg.length * 100) : 0
-    const excellenceRate = allAvg.length > 0 ? (allAvg.filter(a => a >= 80).length / allAvg.length * 100) : 0
-    const gradeDist = { 'A+ (90-100)': allAvg.filter(a=>a>=90).length, 'A (80-89)': allAvg.filter(a=>a>=80&&a<90).length, 'B (70-79)': allAvg.filter(a=>a>=70&&a<80).length, 'C (60-69)': allAvg.filter(a=>a>=60&&a<70).length, 'D (50-59)': allAvg.filter(a=>a>=50&&a<60).length, 'E (40-49)': allAvg.filter(a=>a>=40&&a<50).length, 'F (<40)': allAvg.filter(a=>a<40).length }
-    const topPerformers = [...swa].sort((a,b)=>b.average-a.average).slice(0,10)
-    const bottomPerformers = [...swa].sort((a,b)=>a.average-b.average).slice(0,10)
-    const subjectAvgs = []
-    if (studentData[0]?.subjects?.length > 0) {
-      const sm = {}; studentData.forEach(s => s.subjects?.forEach(sub => { if(!sm[sub.subject]) sm[sub.subject]=[]; sm[sub.subject].push(sub.marks) }))
-      Object.entries(sm).forEach(([sub, marks]) => { subjectAvgs.push({ subject: sub, average: marks.reduce((a,b)=>a+b,0)/marks.length, highest: Math.max(...marks), lowest: Math.min(...marks) }) })
+  const processedData = useMemo(() => {
+    return rawData.map(row => {
+      const marks = subjectCols.map(s => Number(row[s]) || 0);
+      const avg = marks.reduce((a, b) => a + b, 0) / marks.length;
+      let grade = 'F';
+      if (avg >= 90) grade = 'A+';
+      else if (avg >= 80) grade = 'A';
+      else if (avg >= 70) grade = 'B+';
+      else if (avg >= 60) grade = 'B';
+      else if (avg >= 50) grade = 'C';
+      else if (avg >= 40) grade = 'D';
+      return { ...row, _avg: Math.round(avg * 10) / 10, _grade: grade, _total: marks.reduce((a, b) => a + b, 0) };
+    }).sort((a, b) => b._avg - a._avg);
+  }, [rawData, subjectCols]);
+
+  const gradeDistribution = useMemo(() => {
+    const counts = {};
+    processedData.forEach(d => { counts[d._grade] = (counts[d._grade] || 0) + 1; });
+    const order = ['A+', 'A', 'B+', 'B', 'C', 'D', 'F'];
+    return order.filter(g => counts[g]).map(g => ({ name: g, value: counts[g] }));
+  }, [processedData]);
+
+  const subjectAverages = useMemo(() => {
+    return subjectCols.map(s => ({
+      subject: s.length > 12 ? s.slice(0, 12) + '...' : s,
+      fullName: s,
+      avg: Math.round(processedData.reduce((sum, d) => sum + (Number(d[s]) || 0), 0) / processedData.length)
+    }));
+  }, [subjectCols, processedData]);
+
+  const radarData = useMemo(() => {
+    return subjectCols.map(s => ({
+      subject: s.length > 10 ? s.slice(0, 10) + '..' : s,
+      average: Math.round(processedData.reduce((sum, d) => sum + (Number(d[s]) || 0), 0) / processedData.length),
+      fullMark: 100
+    }));
+  }, [subjectCols, processedData]);
+
+  const classStats = useMemo(() => {
+    const avgs = processedData.map(d => d._avg);
+    const overall = avgs.reduce((a, b) => a + b, 0) / avgs.length;
+    const highest = Math.max(...avgs);
+    const lowest = Math.min(...avgs);
+    const pass = processedData.filter(d => d._avg >= 40).length;
+    const toppers = processedData.filter(d => d._avg >= 90).length;
+    const atRisk = processedData.filter(d => d._avg < 50).length;
+    return {
+      overall: Math.round(overall * 10) / 10,
+      highest, lowest,
+      passRate: Math.round((pass / processedData.length) * 100),
+      toppers, atRisk, total: processedData.length
+    };
+  }, [processedData]);
+
+  const aiInsights = useMemo(() => {
+    const insights = [];
+    const hardest = [...subjectAverages].sort((a, b) => a.avg - b.avg)[0];
+    const easiest = [...subjectAverages].sort((a, b) => b.avg - a.avg)[0];
+    insights.push({ type: 'info', icon: Brain, title: 'AI Analysis', text: `Class average is ${classStats.overall}%. ${classStats.overall >= 75 ? 'Overall performance is strong.' : classStats.overall >= 50 ? 'Performance is moderate with room for improvement.' : 'Performance needs significant attention.'}` });
+    insights.push({ type: 'success', icon: TrendingUp, title: 'Strongest Subject', text: `${easiest.fullName} has the highest average at ${easiest.avg}%. Students perform best in this subject.` });
+    if (hardest.avg < 60) {
+      insights.push({ type: 'warning', icon: AlertTriangle, title: 'Needs Attention', text: `${hardest.fullName} has the lowest average at ${hardest.avg}%. Consider additional coaching sessions.` });
     }
-    const dist = Array.from({length:11}, (_,i) => ({ range: `${i*10}-${i*10+9}`, count: allAvg.filter(a=>a>=i*10&&a<(i+1)*10).length }))
-    const trend = swa.slice(0,20).map((s,i) => ({ name: s.rollNo||`S${i+1}`, average: s.average }))
-    return { totalStudents: studentData.length, overallAvg, passRate, excellenceRate, gradeDist, topPerformers, bottomPerformers, subjectAvgs, dist, trend, swa }
-  }, [studentData])
-
-  useEffect(() => {
-    if (!analytics) return
-    const ins = []
-    if (analytics.overallAvg >= 80) ins.push({ type:'success', icon: CheckCircle, title:'Excellent Performance', msg:`Class average is ${analytics.overallAvg.toFixed(1)}%. Outstanding results!` })
-    else if (analytics.overallAvg >= 60) ins.push({ type:'warning', icon: TrendingUp, title:'Good Performance', msg:`Class average is ${analytics.overallAvg.toFixed(1)}%. Room for improvement.` })
-    else ins.push({ type:'danger', icon: AlertTriangle, title:'Needs Attention', msg:`Class average is ${analytics.overallAvg.toFixed(1)}%. Intervention recommended.` })
-    if (analytics.passRate < 90) ins.push({ type:'warning', icon: Users, title:'Pass Rate Alert', msg:`${(100-analytics.passRate).toFixed(1)}% below passing marks.` })
-    if (analytics.excellenceRate > 50) ins.push({ type:'success', icon: Award, title:'High Excellence', msg:`${analytics.excellenceRate.toFixed(1)}% scored above 80%.` })
-    if (analytics.subjectAvgs.length > 0) {
-      const w = analytics.subjectAvgs.reduce((a,b)=>a.average<b.average?a:b)
-      const s = analytics.subjectAvgs.reduce((a,b)=>a.average>b.average?a:b)
-      ins.push({ type:'info', icon: Brain, title:'Subject Analysis', msg:`Strongest: ${s.subject} (${s.average.toFixed(1)}). Weakest: ${w.subject} (${w.average.toFixed(1)}).` })
+    if (classStats.atRisk > 0) {
+      insights.push({ type: 'danger', icon: AlertTriangle, title: 'At-Risk Students', text: `${classStats.atRisk} student(s) have averages below 50%. Early intervention recommended.` });
     }
-    setAiInsights(ins)
-  }, [analytics])
+    if (classStats.toppers > 0) {
+      insights.push({ type: 'success', icon: Award, title: 'High Performers', text: `${classStats.toppers} student(s) scored above 90% average. Consider for honours programme.` });
+    }
+    const topStudent = processedData[0];
+    const bottomStudent = processedData[processedData.length - 1];
+    insights.push({ type: 'info', icon: Trophy, title: 'Class Topper', text: `${topStudent.Name || topStudent['Roll No']} leads with ${topStudent._avg}% average.` });
+    if (classStats.passRate < 100) {
+      insights.push({ type: 'warning', icon: AlertTriangle, title: 'Pass Rate', text: `Pass rate is ${classStats.passRate}%. ${classStats.total - Math.round(classStats.total * classStats.passRate / 100)} student(s) need support.` });
+    }
+    return insights;
+  }, [processedData, subjectAverages, classStats]);
 
-  if (!analytics || studentData.length === 0) {
+  const leaderboard = processedData.slice(0, 10);
+
+  const medalIcons = [<Trophy className="text-yellow-500" size={20} />, <Medal className="text-gray-400" size={20} />, <Medal className="text-amber-600" size={20} />];
+
+  if (!location.state?.studentData) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="glass p-10 text-center max-w-sm">
-          <AlertTriangle className="w-12 h-12 text-amber mx-auto mb-4" />
-          <h2 className="font-sora text-[18px] font-semibold text-text-hi mb-2">No Data Available</h2>
-          <p className="text-[13px] text-text-mid mb-5">Please upload student marks data first.</p>
-          <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={() => navigate('/upload')}
-            className="px-5 py-2.5 rounded-[10px] font-semibold text-[13px] text-white"
-            style={{ background: 'linear-gradient(135deg, #818cf8, #4f46e5)' }}>Go to Upload</motion.button>
-        </div>
+      <div className="min-h-screen flex flex-col items-center justify-center px-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="glass-card p-10 text-center max-w-lg"
+        >
+          <BarChart3 className="mx-auto mb-4 text-indigo-600" size={48} />
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">No Data Available</h2>
+          <p className="text-gray-600 mb-6">Upload student marks data first to view analytics and AI insights.</p>
+          <Link
+            to="/upload"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
+          >
+            <ChevronLeft size={18} />
+            Go to Upload
+          </Link>
+        </motion.div>
       </div>
-    )
+    );
   }
 
-  const gradePie = Object.entries(analytics.gradeDist).filter(([,c])=>c>0).map(([name,value])=>({name,value}))
+  const insightsColors = { info: 'bg-blue-50 border-blue-200 text-blue-800', success: 'bg-green-50 border-green-200 text-green-800', warning: 'bg-yellow-50 border-yellow-200 text-yellow-800', danger: 'bg-red-50 border-red-200 text-red-800' };
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: 0.05 } } }} className="flex flex-col gap-5">
-
-      <div className="flex items-center justify-between">
-        <div>
-          <motion.button whileHover={{ x: -3 }} onClick={() => navigate('/upload')} className="flex items-center gap-1.5 text-[12px] text-text-low hover:text-indigo mb-2 transition-colors">
-            <ArrowLeft className="w-3.5 h-3.5" /> Back to Upload
-          </motion.button>
-          <h1 className="font-sora text-[22px] font-semibold text-text-hi">Analytics Dashboard</h1>
-          <p className="text-[13px] text-text-mid mt-1">{departmentNames[department]} · {year}{year==='1'?'st':year==='2'?'nd':year==='3'?'rd':'th'} Year</p>
+    <div className="min-h-screen flex flex-col items-center">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-6xl mx-auto py-12 px-4"
+      >
+        <div className="text-center mb-10">
+          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">
+            <span className="text-yellow-200">Analytics</span> Dashboard
+          </h1>
+          <p className="text-white/70 text-base max-w-xl mx-auto mb-2">
+            AI-powered insights for {dept} — {year}
+          </p>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 text-white text-sm">
+            <Users size={14} />
+            <span>{classStats.total} Students</span>
+            <span>•</span>
+            <span>{subjectCols.length} Subjects</span>
+          </div>
         </div>
-      </div>
 
-      {/* Stats */}
-      <motion.div variants={card} className="grid grid-cols-4 gap-4">
-        {[
-          { label: "TOTAL STUDENTS", value: analytics.totalStudents, color: "text-indigo", icon: Users },
-          { label: "AVG. SCORE", value: `${analytics.overallAvg.toFixed(1)}`, color: "text-green", icon: TrendingUp },
-          { label: "PASS RATE", value: `${analytics.passRate.toFixed(0)}%`, color: "text-amber", icon: CheckCircle },
-          { label: "EXCELLENCE", value: `${analytics.excellenceRate.toFixed(0)}%`, color: "text-green", icon: Award },
-        ].map((s, i) => (
-          <motion.div key={i} variants={card} whileHover={{ borderColor: "rgba(129,140,248,0.35)", y: -2 }}
-            className="glass p-5 flex flex-col gap-2 transition-all duration-200">
-            <span className="text-[11.5px] text-text-mid uppercase tracking-[0.06em] font-medium flex items-center gap-1.5">
-              <s.icon className="w-3.5 h-3.5" /> {s.label}
-            </span>
-            <span className={`font-mono text-[28px] font-bold ${s.color}`}>{s.value}</span>
-          </motion.div>
-        ))}
-      </motion.div>
-
-      {/* AI Insights */}
-      <motion.div variants={card} className="glass p-5">
-        <h2 className="font-sora text-[15px] font-semibold text-text-hi mb-4 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-indigo" /> AI-Powered Insights
-        </h2>
-        <div className="grid grid-cols-3 gap-3">
-          {aiInsights.map((ins, i) => (
-            <motion.div key={i} variants={card}
-              className="p-4 rounded-[14px] border-l-[3px]"
-              style={{
-                background: ins.type==='success' ? 'rgba(52,211,153,0.06)' : ins.type==='warning' ? 'rgba(251,191,36,0.06)' : ins.type==='danger' ? 'rgba(248,113,113,0.06)' : 'rgba(129,140,248,0.06)',
-                borderColor: ins.type==='success' ? '#34d399' : ins.type==='warning' ? '#fbbf24' : ins.type==='danger' ? '#f87171' : '#818cf8',
-              }}>
-              <div className="flex items-start gap-2.5">
-                <ins.icon className={`w-4 h-4 flex-shrink-0 mt-0.5 ${ins.type==='success'?'text-green':ins.type==='warning'?'text-amber':ins.type==='danger'?'text-rose':'text-indigo'}`} />
-                <div>
-                  <h4 className="text-[13px] font-semibold text-text-hi">{ins.title}</h4>
-                  <p className="text-[11.5px] text-text-mid mt-1 leading-relaxed">{ins.msg}</p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
-
-      {/* Charts Grid */}
-      <div className="grid grid-cols-2 gap-4">
-        <motion.div variants={card} className="glass p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-sora text-[14px] font-semibold text-text-hi">Grade Distribution</h3>
-            <span className="text-[11px] text-text-low">Class average</span>
-          </div>
-          <ResponsiveContainer width="100%" height={260}>
-            <PieChart><Pie data={gradePie} cx="50%" cy="50%" innerRadius={55} outerRadius={90} paddingAngle={4} dataKey="value"
-              label={({ name, percent }) => `${name.split(' ')[0]} ${(percent*100).toFixed(0)}%`} labelLine={false}>
-              {gradePie.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-            </Pie><Tooltip /></PieChart>
-          </ResponsiveContainer>
+        {/* Class Overview Cards */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
+        >
+          {[
+            { label: 'Class Average', value: `${classStats.overall}%`, icon: BarChart3, color: 'text-indigo-600' },
+            { label: 'Highest Average', value: `${classStats.highest}%`, icon: ArrowUpRight, color: 'text-green-600' },
+            { label: 'Pass Rate', value: `${classStats.passRate}%`, icon: BookOpen, color: 'text-blue-600' },
+            { label: 'At-Risk Students', value: classStats.atRisk, icon: AlertTriangle, color: 'text-red-600' },
+          ].map((stat, i) => {
+            const Icon = stat.icon;
+            return (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 + i * 0.05 }}
+                className="glass-card p-5 text-center"
+              >
+                <Icon className={`mx-auto mb-2 ${stat.color}`} size={24} />
+                <p className="text-2xl font-extrabold text-gray-900">{stat.value}</p>
+                <p className="text-xs text-gray-500 mt-1">{stat.label}</p>
+              </motion.div>
+            );
+          })}
         </motion.div>
 
-        <motion.div variants={card} className="glass p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-sora text-[14px] font-semibold text-text-hi">Score Distribution</h3>
-            <span className="text-[11px] text-text-low">Histogram</span>
-          </div>
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={analytics.dist}><CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-              <XAxis dataKey="range" tick={{ fontSize: 10, fill: '#666c8c' }} /><YAxis tick={{ fontSize: 10, fill: '#666c8c' }} />
-              <Tooltip contentStyle={{ background: '#0d1120', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, fontSize: 12 }} />
-              <Bar dataKey="count" fill="url(#barGrad)" radius={[5,5,2,2]} />
-              <defs><linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#818cf8" /><stop offset="100%" stopColor="#4f46e5" />
-              </linearGradient></defs>
-            </BarChart>
-          </ResponsiveContainer>
-        </motion.div>
-
-        <motion.div variants={card} className="glass p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-sora text-[14px] font-semibold text-text-hi">Performance Trend</h3>
-            <span className="text-[11px] text-text-low">Student order</span>
-          </div>
-          <ResponsiveContainer width="100%" height={260}>
-            <AreaChart data={analytics.trend}><CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-              <XAxis dataKey="name" tick={{ fontSize: 9, fill: '#666c8c' }} /><YAxis domain={[0,100]} tick={{ fontSize: 10, fill: '#666c8c' }} />
-              <Tooltip contentStyle={{ background: '#0d1120', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, fontSize: 12 }} />
-              <defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#818cf8" stopOpacity={0.3} /><stop offset="95%" stopColor="#818cf8" stopOpacity={0} />
-              </linearGradient></defs>
-              <Area type="monotone" dataKey="average" stroke="#818cf8" fill="url(#areaGrad)" />
-            </AreaChart>
-          </ResponsiveContainer>
-        </motion.div>
-
-        {analytics.subjectAvgs.length > 0 && (
-          <motion.div variants={card} className="glass p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-sora text-[14px] font-semibold text-text-hi">Subject Performance</h3>
-              <span className="text-[11px] text-text-low">Radar</span>
+        {/* AI Insights */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mb-8"
+        >
+          <div className="glass-card p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Brain className="text-indigo-600" size={22} />
+              <h2 className="text-lg font-bold text-gray-900">AI Insights</h2>
             </div>
-            <ResponsiveContainer width="100%" height={260}>
-              <RadarChart data={analytics.subjectAvgs}><PolarGrid stroke="rgba(255,255,255,0.08)" />
-                <PolarAngleAxis dataKey="subject" tick={{ fontSize: 10, fill: '#a3a8c3' }} />
-                <PolarRadiusAxis angle={30} domain={[0,100]} tick={{ fontSize: 9, fill: '#666c8c' }} />
-                <Radar name="Avg" dataKey="average" stroke="#818cf8" fill="#818cf8" fillOpacity={0.25} />
-                <Tooltip contentStyle={{ background: '#0d1120', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, fontSize: 12 }} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {aiInsights.map((insight, i) => {
+                const Icon = insight.icon;
+                return (
+                  <div key={i} className={`flex items-start gap-3 p-3 rounded-xl border ${insightsColors[insight.type]}`}>
+                    <Icon size={18} className="mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-semibold text-sm">{insight.title}</p>
+                      <p className="text-xs mt-0.5 opacity-80">{insight.text}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Charts Row 1 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          {/* Grade Distribution */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+            className="glass-card p-6"
+          >
+            <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">Grade Distribution</h3>
+            <ResponsiveContainer width="100%" height={280}>
+              <PieChart>
+                <Pie
+                  data={gradeDistribution}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  innerRadius={50}
+                  paddingAngle={3}
+                  dataKey="value"
+                  label={({ name, value }) => `${name}: ${value}`}
+                >
+                  {gradeDistribution.map((entry, i) => (
+                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </motion.div>
+
+          {/* Subject Averages Bar */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.35 }}
+            className="glass-card p-6"
+          >
+            <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">Subject Averages</h3>
+            <ResponsiveContainer width="100%" height={280}>
+              <BarChart data={subjectAverages} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis dataKey="subject" tick={{ fontSize: 11 }} />
+                <YAxis domain={[0, 100]} />
+                <Tooltip />
+                <Bar dataKey="avg" radius={[6, 6, 0, 0]}>
+                  {subjectAverages.map((_, i) => (
+                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </motion.div>
+        </div>
+
+        {/* Charts Row 2 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          {/* Radar */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+            className="glass-card p-6"
+          >
+            <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">Performance Radar</h3>
+            <ResponsiveContainer width="100%" height={280}>
+              <RadarChart data={radarData}>
+                <PolarGrid stroke="#e5e7eb" />
+                <PolarAngleAxis dataKey="subject" tick={{ fontSize: 10 }} />
+                <PolarRadiusAxis angle={30} domain={[0, 100]} />
+                <Radar name="Average" dataKey="average" stroke="#6366f1" fill="#6366f1" fillOpacity={0.3} />
+                <Tooltip />
               </RadarChart>
             </ResponsiveContainer>
           </motion.div>
-        )}
-      </div>
 
-      {/* Leaderboard + At Risk */}
-      <div className="grid grid-cols-2 gap-4">
-        <motion.div variants={card} className="glass p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-sora text-[14px] font-semibold text-text-hi flex items-center gap-2">
-              <Award className="w-4 h-4 text-amber" /> Top Performers
-            </h3>
-            <span className="text-[10.5px] font-semibold px-2.5 py-1 rounded-full bg-green/10 text-green border border-green/25">Live</span>
-          </div>
-          {analytics.topPerformers.slice(0,5).map((s, i) => (
-            <div key={i} className="flex items-center gap-3 py-2.5 border-b border-white/[0.04] last:border-0">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center font-mono text-[11px] font-bold"
-                style={{ background: 'linear-gradient(135deg, rgba(129,140,248,0.5), rgba(251,191,36,0.4))', border: '1px solid rgba(255,255,255,0.15)' }}>
-                {i+1}
-              </div>
-              <div className="flex-1">
-                <div className="text-[13px] font-medium text-text-hi">{s.name}</div>
-                <div className="text-[11px] text-text-low">{s.rollNo}</div>
-              </div>
-              <span className="font-mono text-[13px] font-semibold text-amber">{s.average.toFixed(1)}</span>
-            </div>
-          ))}
-        </motion.div>
-
-        <motion.div variants={card} className="glass p-5">
-          <h3 className="font-sora text-[14px] font-semibold text-text-hi mb-4 flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-rose" /> Students Needing Support
-          </h3>
-          {analytics.bottomPerformers.filter(s=>s.average<50).length > 0 ? (
-            analytics.bottomPerformers.filter(s=>s.average<50).map((s, i) => (
-              <div key={i} className="flex items-center gap-3 py-2.5 border-b border-white/[0.04] last:border-0">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center font-mono text-[11px] font-bold bg-rose/20 text-rose border border-rose/25">{i+1}</div>
-                <div className="flex-1">
-                  <div className="text-[13px] font-medium text-text-hi">{s.name}</div>
-                  <div className="text-[11px] text-text-low">{s.rollNo}</div>
-                </div>
-                <span className="font-mono text-[13px] font-semibold text-rose">{s.average.toFixed(1)}</span>
-              </div>
-            ))
-          ) : <p className="text-center text-[13px] text-text-low py-6">All students performing well!</p>}
-        </motion.div>
-      </div>
-
-      {/* Full Table */}
-      <motion.div variants={card} className="glass p-5">
-        <h3 className="font-sora text-[14px] font-semibold text-text-hi mb-4 flex items-center gap-2">
-          <BarChart3 className="w-4 h-4 text-indigo" /> Complete Student Data
-        </h3>
-        <div className="overflow-x-auto">
-          <table className="w-full text-[12px]">
-            <thead><tr className="border-b border-white/[0.06]">
-              <th className="p-3 text-left text-text-low font-medium">Roll No</th>
-              <th className="p-3 text-left text-text-low font-medium">Name</th>
-              <th className="p-3 text-center text-text-low font-medium">Subjects</th>
-              <th className="p-3 text-center text-text-low font-medium">Average</th>
-              <th className="p-3 text-center text-text-low font-medium">Status</th>
-            </tr></thead>
-            <tbody>
-              {analytics.swa.map((s, i) => (
-                <tr key={i} className="border-b border-white/[0.04] hover:bg-white/[0.02]">
-                  <td className="p-3 font-mono text-text-hi">{s.rollNo}</td>
-                  <td className="p-3 text-text-mid">{s.name}</td>
-                  <td className="p-3 text-center text-text-mid">{s.marks.length}</td>
-                  <td className="p-3 text-center font-mono font-semibold text-indigo">{s.average.toFixed(1)}</td>
-                  <td className="p-3 text-center">
-                    <span className={`px-2 py-0.5 rounded-full text-[10.5px] font-semibold ${
-                      s.average>=80?'bg-green/10 text-green border border-green/25':s.average>=60?'bg-indigo/10 text-indigo border border-indigo/25':s.average>=40?'bg-amber/10 text-amber border border-amber/25':'bg-rose/10 text-rose border border-rose/25'
-                    }`}>
-                      {s.average>=80?'Excellent':s.average>=60?'Good':s.average>=40?'Average':'At Risk'}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {/* Line Chart */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.45 }}
+            className="glass-card p-6"
+          >
+            <h3 className="text-lg font-bold text-gray-900 mb-4 text-center">Student Performance Trend</h3>
+            <ResponsiveContainer width="100%" height={280}>
+              <AreaChart data={processedData.map((d, i) => ({ name: d.Name || d['Roll No']?.slice(-3) || `S${i + 1}`, avg: d._avg }))}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                <YAxis domain={[0, 100]} />
+                <Tooltip />
+                <Area type="monotone" dataKey="avg" stroke="#6366f1" fill="#6366f1" fillOpacity={0.2} strokeWidth={2} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </motion.div>
         </div>
+
+        {/* Leaderboard */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="glass-card p-6 mb-8"
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <Trophy className="text-yellow-500" size={22} />
+            <h2 className="text-lg font-bold text-gray-900">Top Performers Leaderboard</h2>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="px-4 py-3 text-left font-semibold text-gray-600 text-xs uppercase">Rank</th>
+                  <th className="px-4 py-3 text-left font-semibold text-gray-600 text-xs uppercase">Student</th>
+                  <th className="px-4 py-3 text-center font-semibold text-gray-600 text-xs uppercase">Average</th>
+                  <th className="px-4 py-3 text-center font-semibold text-gray-600 text-xs uppercase">Grade</th>
+                  <th className="px-4 py-3 text-center font-semibold text-gray-600 text-xs uppercase">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {leaderboard.map((student, i) => (
+                  <motion.tr
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 + i * 0.03 }}
+                    className={`border-b border-gray-100 hover:bg-gray-50 ${i < 3 ? 'bg-yellow-50/50' : ''}`}
+                  >
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        {i < 3 ? medalIcons[i] : <span className="w-5 text-center font-bold text-gray-500 text-xs">#{i + 1}</span>}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 font-medium text-gray-900">{student.Name || student['Roll No']}</td>
+                    <td className="px-4 py-3 text-center">
+                      <span className={`font-bold ${student._avg >= 90 ? 'text-green-600' : student._avg >= 70 ? 'text-blue-600' : student._avg >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
+                        {student._avg}%
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                        student._grade === 'A+' ? 'bg-green-100 text-green-700' :
+                        student._grade === 'A' ? 'bg-blue-100 text-blue-700' :
+                        student._grade === 'B+' ? 'bg-purple-100 text-purple-700' :
+                        student._grade === 'B' ? 'bg-cyan-100 text-cyan-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>
+                        {student._grade}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-center text-gray-600 font-mono">{student._total}</td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </motion.div>
+
+        {/* Full Data Table */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="glass-card p-6 mb-8"
+        >
+          <h2 className="text-lg font-bold text-gray-900 mb-4">Complete Student Data</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-gray-50">
+                  {['#', 'Roll No', 'Name', ...subjectCols, 'Average', 'Grade'].map((h, i) => (
+                    <th key={i} className="px-3 py-2 text-left font-semibold text-gray-600 text-xs uppercase">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {processedData.map((student, i) => (
+                  <tr key={i} className="border-t border-gray-100 hover:bg-gray-50">
+                    <td className="px-3 py-2 text-gray-400 text-xs">{i + 1}</td>
+                    <td className="px-3 py-2 text-gray-700 font-mono text-xs">{student['Roll No']}</td>
+                    <td className="px-3 py-2 font-medium text-gray-900 text-xs">{student.Name}</td>
+                    {subjectCols.map((s, j) => (
+                      <td key={j} className="px-3 py-2 text-center text-gray-700 font-mono text-xs">
+                        {student[s]}
+                      </td>
+                    ))}
+                    <td className="px-3 py-2 text-center font-bold text-xs">{student._avg}%</td>
+                    <td className="px-3 py-2 text-center">
+                      <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                        student._grade === 'A+' ? 'bg-green-100 text-green-700' :
+                        student._grade === 'A' ? 'bg-blue-100 text-blue-700' :
+                        student._grade === 'B+' ? 'bg-purple-100 text-purple-700' :
+                        student._grade === 'B' ? 'bg-cyan-100 text-cyan-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>
+                        {student._grade}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </motion.div>
+
+        {/* Actions */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+          className="text-center"
+        >
+          <Link
+            to="/upload"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all mr-3"
+          >
+            <ChevronLeft size={18} />
+            Upload New Data
+          </Link>
+          <button
+            onClick={() => window.print()}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
+          >
+            <Download size={18} />
+            Export Report
+          </button>
+        </motion.div>
       </motion.div>
-    </motion.div>
-  )
+    </div>
+  );
 }
