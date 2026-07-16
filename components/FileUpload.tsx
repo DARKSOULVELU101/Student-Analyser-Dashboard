@@ -7,22 +7,24 @@ import {
   FileText, 
   FileSpreadsheet, 
   File,
-  CheckCircle,
   X,
   Loader2,
-  AlertCircle,
-  Sparkles
+  Sparkles,
+  CheckCircle,
+  ArrowRight
 } from 'lucide-react'
 
 interface FileUploadProps {
   onDataUpload: (data: any[]) => void
+  setActiveSection: (section: string) => void
 }
 
-export default function FileUpload({ onDataUpload }: FileUploadProps) {
+export default function FileUpload({ onDataUpload, setActiveSection }: FileUploadProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [isProcessing, setIsProcessing] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
+  const [isComplete, setIsComplete] = useState(false)
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -37,19 +39,8 @@ export default function FileUpload({ onDataUpload }: FileUploadProps) {
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     setIsDragging(false)
-    
     const files = Array.from(e.dataTransfer.files)
-    const validFiles = files.filter(file => 
-      file.type === 'application/pdf' ||
-      file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
-      file.type === 'text/csv' ||
-      file.name.endsWith('.xlsx') ||
-      file.name.endsWith('.xls')
-    )
-    
-    if (validFiles.length > 0) {
-      setUploadedFiles(prev => [...prev, ...validFiles])
-    }
+    setUploadedFiles(prev => [...prev, ...files])
   }, [])
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,29 +56,22 @@ export default function FileUpload({ onDataUpload }: FileUploadProps) {
     setIsProcessing(true)
     setUploadProgress(0)
 
-    // Simulate processing
-    for (let i = 0; i <= 100; i += 10) {
-      await new Promise(resolve => setTimeout(resolve, 200))
+    for (let i = 0; i <= 100; i += 5) {
+      await new Promise(resolve => setTimeout(resolve, 100))
       setUploadProgress(i)
     }
 
-    // Generate mock data
-    const mockData = generateMockData()
-    onDataUpload(mockData)
-    setIsProcessing(false)
-    setUploadedFiles([])
-  }
-
-  const generateMockData = () => {
     const departments = ['CSE', 'ECE', 'EEE', 'MECH', 'CIVIL']
+    const years = ['2021', '2022', '2023', '2024', '2025']
     const semesters = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th']
     const data = []
 
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 100; i++) {
       data.push({
         id: `STU${(1000 + i).toString()}`,
         name: `Student ${i + 1}`,
         department: departments[Math.floor(Math.random() * departments.length)],
+        year: years[Math.floor(Math.random() * years.length)],
         semester: semesters[Math.floor(Math.random() * semesters.length)],
         marks: {
           internal: Math.floor(Math.random() * 40) + 60,
@@ -99,42 +83,60 @@ export default function FileUpload({ onDataUpload }: FileUploadProps) {
         gpa: (Math.random() * 2 + 2).toFixed(2),
       })
     }
-    return data
+
+    onDataUpload(data)
+    setIsProcessing(false)
+    setIsComplete(true)
+    
+    setTimeout(() => {
+      setActiveSection('analytics')
+    }, 1500)
   }
 
   const getFileIcon = (file: File) => {
-    if (file.type === 'application/pdf') return <FileText className="w-8 h-8 text-red-400" />
+    if (file.type === 'application/pdf') return <FileText className="w-6 h-6" style={{ color: '#FF3B30' }} />
     if (file.type.includes('spreadsheet') || file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) 
-      return <FileSpreadsheet className="w-8 h-8 text-green-400" />
-    return <File className="w-8 h-8 text-blue-400" />
+      return <FileSpreadsheet className="w-6 h-6" style={{ color: '#34C759' }} />
+    return <File className="w-6 h-6" style={{ color: '#007AFF' }} />
   }
 
   return (
     <section className="py-28 px-4 sm:px-6 lg:px-8 min-h-screen">
       <div className="max-w-4xl mx-auto">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
+            className="inline-flex items-center gap-2 px-5 py-2.5 glass-card rounded-full text-sm font-medium text-[#007AFF] mb-6"
+          >
+            <Sparkles className="w-4 h-4" />
+            Step 1: Upload Student Data
+          </motion.div>
+
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#1D1D1F] mb-4">
             Upload Student Data
           </h2>
-          <p className="text-dark-300 max-w-2xl mx-auto">
+          <p className="text-[#6E6E73] max-w-2xl mx-auto text-lg">
             Upload Excel, PDF, or CSV files containing student performance data. 
-            Our AI will automatically analyze and generate insights.
+            Our AI will automatically analyse and generate insights.
           </p>
         </motion.div>
 
         {/* Upload Area */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className={`relative glass rounded-3xl p-8 transition-all duration-300 ${
-            isDragging ? 'glow-blue border-primary-500' : ''
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className={`relative glass-card rounded-3xl p-10 transition-all duration-500 ${
+            isDragging ? 'border-2 border-[#007AFF] shadow-xl' : ''
           }`}
+          style={isDragging ? { boxShadow: '0 12px 48px rgba(0, 122, 255, 0.15)' } : {}}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
@@ -142,22 +144,25 @@ export default function FileUpload({ onDataUpload }: FileUploadProps) {
           <div className="text-center">
             <motion.div
               animate={{ 
-                scale: isDragging ? 1.1 : 1,
-                y: isDragging ? -10 : 0 
+                scale: isDragging ? 1.15 : 1,
+                y: isDragging ? -15 : 0,
+                rotate: isDragging ? 5 : 0
               }}
-              className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-500/20 to-accent-500/20 mb-6"
+              transition={{ type: 'spring', stiffness: 300 }}
+              className="inline-flex items-center justify-center w-24 h-24 rounded-3xl mb-6"
+              style={{ background: 'linear-gradient(135deg, #007AFF15, #5856D615)' }}
             >
-              <Upload className="w-10 h-10 text-primary-400" />
+              <Upload className="w-12 h-12" style={{ color: '#007AFF' }} />
             </motion.div>
 
-            <h3 className="text-xl font-semibold text-white mb-2">
+            <h3 className="text-xl font-bold text-[#1D1D1F] mb-2">
               {isDragging ? 'Drop your files here' : 'Drag & drop files here'}
             </h3>
-            <p className="text-dark-400 mb-6">
+            <p className="text-[#6E6E73] mb-6">
               or click to browse from your computer
             </p>
 
-            <label className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-colors cursor-pointer">
+            <label className="inline-flex items-center gap-2 px-8 py-4 glass-btn text-white font-semibold rounded-2xl hover:shadow-xl cursor-pointer">
               <Upload className="w-5 h-5" />
               Select Files
               <input
@@ -169,37 +174,32 @@ export default function FileUpload({ onDataUpload }: FileUploadProps) {
               />
             </label>
 
-            <p className="text-xs text-dark-500 mt-4">
-              Supported formats: Excel (.xlsx, .xls), PDF, CSV
-            </p>
-          </div>
-
-          {/* Accepted Formats */}
-          <div className="flex flex-wrap justify-center gap-4 mt-8">
-            {[
-              { icon: FileSpreadsheet, label: 'Excel', color: 'text-green-400' },
-              { icon: FileText, label: 'PDF', color: 'text-red-400' },
-              { icon: File, label: 'CSV', color: 'text-blue-400' },
-            ].map((format) => (
-              <div key={format.label} className="flex items-center gap-2 px-4 py-2 bg-dark-800/50 rounded-xl">
-                <format.icon className={`w-4 h-4 ${format.color}`} />
-                <span className="text-sm text-dark-300">{format.label}</span>
-              </div>
-            ))}
+            <div className="flex flex-wrap justify-center gap-3 mt-8">
+              {[
+                { icon: FileSpreadsheet, label: 'Excel', color: '#34C759' },
+                { icon: FileText, label: 'PDF', color: '#FF3B30' },
+                { icon: File, label: 'CSV', color: '#007AFF' },
+              ].map((format) => (
+                <div key={format.label} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/40 border border-white/30">
+                  <format.icon className="w-4 h-4" style={{ color: format.color }} />
+                  <span className="text-sm font-medium text-[#6E6E73]">{format.label}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </motion.div>
 
-        {/* Uploaded Files List */}
+        {/* Uploaded Files */}
         <AnimatePresence>
           {uploadedFiles.length > 0 && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               className="mt-8 space-y-4"
             >
-              <h4 className="text-lg font-semibold text-white flex items-center gap-2">
-                <FileText className="w-5 h-5 text-primary-400" />
+              <h4 className="text-lg font-bold text-[#1D1D1F] flex items-center gap-2">
+                <FileText className="w-5 h-5" style={{ color: '#007AFF' }} />
                 Uploaded Files ({uploadedFiles.length})
               </h4>
 
@@ -207,56 +207,75 @@ export default function FileUpload({ onDataUpload }: FileUploadProps) {
                 {uploadedFiles.map((file, index) => (
                   <motion.div
                     key={`${file.name}-${index}`}
-                    initial={{ opacity: 0, x: -20 }}
+                    initial={{ opacity: 0, x: -30 }}
                     animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    className="flex items-center justify-between p-4 bg-dark-800/50 rounded-xl"
+                    exit={{ opacity: 0, x: 30 }}
+                    transition={{ type: 'spring', stiffness: 200 }}
+                    className="flex items-center justify-between p-4 glass-card rounded-2xl"
                   >
                     <div className="flex items-center gap-4">
-                      {getFileIcon(file)}
+                      <div className="w-12 h-12 rounded-xl bg-white/50 flex items-center justify-center">
+                        {getFileIcon(file)}
+                      </div>
                       <div>
-                        <div className="text-sm font-medium text-white">{file.name}</div>
-                        <div className="text-xs text-dark-400">
+                        <div className="text-sm font-semibold text-[#1D1D1F]">{file.name}</div>
+                        <div className="text-xs text-[#6E6E73]">
                           {(file.size / 1024).toFixed(2)} KB
                         </div>
                       </div>
                     </div>
-                    <button
+                    <motion.button
                       onClick={() => removeFile(index)}
-                      className="p-2 rounded-lg hover:bg-dark-700 transition-colors text-dark-400 hover:text-red-400 cursor-pointer"
+                      className="p-2 rounded-xl hover:bg-[#FF3B30]/10 transition-colors text-[#AEAEB2] hover:text-[#FF3B30] cursor-pointer"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
                     >
                       <X className="w-5 h-5" />
-                    </button>
+                    </motion.button>
                   </motion.div>
                 ))}
               </div>
 
               {/* Process Button */}
-              <motion.button
-                onClick={processFiles}
-                disabled={isProcessing}
-                className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-primary-600 to-accent-500 text-white font-semibold rounded-xl hover:from-primary-700 hover:to-accent-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                whileHover={{ scale: isProcessing ? 1 : 1.02 }}
-                whileTap={{ scale: isProcessing ? 1 : 0.98 }}
-              >
-                {isProcessing ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Processing... {uploadProgress}%
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-5 h-5" />
-                    Analyze with AI
-                  </>
-                )}
-              </motion.button>
+              {!isComplete ? (
+                <motion.button
+                  onClick={processFiles}
+                  disabled={isProcessing}
+                  className="w-full flex items-center justify-center gap-3 px-8 py-4 glass-btn text-white font-bold rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-lg"
+                  whileHover={!isProcessing ? { scale: 1.02 } : {}}
+                  whileTap={!isProcessing ? { scale: 0.98 } : {}}
+                >
+                  {isProcessing ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Analysing... {uploadProgress}%
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-5 h-5" />
+                      Analyse with AI
+                      <ArrowRight className="w-5 h-5" />
+                    </>
+                  )}
+                </motion.button>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="w-full flex items-center justify-center gap-3 px-8 py-4 rounded-2xl text-white font-bold text-lg"
+                  style={{ background: 'linear-gradient(135deg, #34C759, #30B350)' }}
+                >
+                  <CheckCircle className="w-6 h-6" />
+                  Analysis Complete! Redirecting...
+                </motion.div>
+              )}
 
               {/* Progress Bar */}
               {isProcessing && (
-                <div className="w-full h-2 bg-dark-800 rounded-full overflow-hidden">
+                <div className="w-full h-2.5 rounded-full overflow-hidden bg-white/30">
                   <motion.div
-                    className="h-full progress-bar"
+                    className="h-full rounded-full"
+                    style={{ background: 'linear-gradient(90deg, #007AFF, #5856D6, #AF52DE)' }}
                     initial={{ width: 0 }}
                     animate={{ width: `${uploadProgress}%` }}
                     transition={{ duration: 0.3 }}

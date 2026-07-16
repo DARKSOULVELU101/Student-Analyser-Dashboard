@@ -9,8 +9,7 @@ import {
   Bot, 
   Menu, 
   X,
-  GraduationCap,
-  ChevronDown
+  GraduationCap
 } from 'lucide-react'
 
 interface NavbarProps {
@@ -39,11 +38,11 @@ export default function Navbar({ activeSection, setActiveSection }: NavbarProps)
 
   return (
     <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-      className={`fixed top-4 left-4 right-4 z-50 transition-all duration-300 ${
-        isScrolled ? 'glass glow-blue' : 'glass-light'
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+      className={`fixed top-4 left-4 right-4 z-50 transition-all duration-500 ${
+        isScrolled ? 'glass-nav shadow-lg' : 'glass'
       } rounded-2xl`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -52,28 +51,41 @@ export default function Navbar({ activeSection, setActiveSection }: NavbarProps)
           <motion.div 
             className="flex items-center gap-3 cursor-pointer"
             whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setActiveSection('dashboard')}
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl flex items-center justify-center">
+            <motion.div 
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg, #007AFF, #5856D6)' }}
+              whileHover={{ rotate: 10 }}
+              transition={{ type: 'spring', stiffness: 300 }}
+            >
               <GraduationCap className="w-6 h-6 text-white" />
-            </div>
+            </motion.div>
             <div className="hidden sm:block">
-              <h1 className="text-sm font-bold text-white font-code">Student Analyser</h1>
-              <p className="text-xs text-dark-400">SKEC & SKIT</p>
+              <h1 className="text-sm font-bold text-[#1D1D1F]">Student Analyser</h1>
+              <p className="text-xs text-[#6E6E73]">SKEC & SKIT</p>
             </div>
           </motion.div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
-            {navItems.map((item) => (
+            {navItems.map((item, index) => (
               <motion.button
                 key={item.id}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 + index * 0.05, duration: 0.5 }}
                 onClick={() => setActiveSection(item.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 cursor-pointer ${
                   activeSection === item.id
-                    ? 'bg-primary-600 text-white glow-blue'
-                    : 'text-dark-300 hover:text-white hover:bg-dark-700/50'
+                    ? 'text-white shadow-lg'
+                    : 'text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-white/50'
                 }`}
+                style={activeSection === item.id ? { 
+                  background: 'linear-gradient(135deg, #007AFF, #5856D6)',
+                  boxShadow: '0 4px 16px rgba(0, 122, 255, 0.3)'
+                } : {}}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -85,11 +97,21 @@ export default function Navbar({ activeSection, setActiveSection }: NavbarProps)
 
           {/* Mobile Menu Button */}
           <motion.button
-            className="md:hidden p-2 rounded-xl text-dark-300 hover:text-white hover:bg-dark-700/50 cursor-pointer"
-            whileTap={{ scale: 0.95 }}
+            className="md:hidden p-2 rounded-xl text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-white/50 transition-colors cursor-pointer"
+            whileTap={{ scale: 0.9 }}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            <AnimatePresence mode="wait">
+              {isMobileMenuOpen ? (
+                <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
+                  <X className="w-6 h-6" />
+                </motion.div>
+              ) : (
+                <motion.div key="menu" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }}>
+                  <Menu className="w-6 h-6" />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.button>
         </div>
       </div>
@@ -101,22 +123,29 @@ export default function Navbar({ activeSection, setActiveSection }: NavbarProps)
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="md:hidden glass border-t border-dark-700/50"
+            transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="md:hidden glass border-t border-white/30 overflow-hidden"
           >
             <div className="px-4 py-3 space-y-2">
-              {navItems.map((item) => (
+              {navItems.map((item, index) => (
                 <motion.button
                   key={item.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
                   onClick={() => {
                     setActiveSection(item.id)
                     setIsMobileMenuOpen(false)
                   }}
                   className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer ${
                     activeSection === item.id
-                      ? 'bg-primary-600 text-white'
-                      : 'text-dark-300 hover:text-white hover:bg-dark-700/50'
+                      ? 'text-white'
+                      : 'text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-white/50'
                   }`}
+                  style={activeSection === item.id ? { 
+                    background: 'linear-gradient(135deg, #007AFF, #5856D6)',
+                    boxShadow: '0 4px 16px rgba(0, 122, 255, 0.3)'
+                  } : {}}
                   whileTap={{ scale: 0.95 }}
                 >
                   <item.icon className="w-5 h-5" />
