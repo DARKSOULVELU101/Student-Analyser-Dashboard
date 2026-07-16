@@ -1,477 +1,191 @@
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import { GraduationCap, BookOpen, TrendingUp, ArrowRight, Sparkles, Users, Award, Target, ChevronDown } from 'lucide-react'
+import { TrendingUp, Users, Award, AlertTriangle, ArrowRight, BarChart3, Activity, GraduationCap, BookOpen, Target, Building2, Phone, Mail, MapPin } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
 const quotes = [
-  "Education is the passport to the future, for tomorrow belongs to those who prepare for it today.",
-  "Success is not final, failure is not fatal: it is the courage to continue that counts.",
-  "The future belongs to those who believe in the beauty of their dreams.",
-  "Knowledge is power. Education is the key to unlocking the world.",
-  "Live as if you were to die tomorrow. Learn as if you were to live forever.",
-]
-
-const colors = ['#f59e0b', '#ef4444', '#ec4899', '#8b5cf6', '#06b6d4', '#10b981', '#f97316']
-
-const features = [
-  { icon: Users, title: "Student Management", desc: "Track and manage student data efficiently across all departments", color: "from-blue-500 to-indigo-600" },
-  { icon: TrendingUp, title: "Performance Analytics", desc: "AI-powered insights into academic progress and trends", color: "from-green-500 to-emerald-600" },
-  { icon: Award, title: "Grade Analysis", desc: "Comprehensive marks evaluation and grading system", color: "from-purple-500 to-pink-600" },
-  { icon: Target, title: "Goal Tracking", desc: "Set and monitor academic milestones for every student", color: "from-yellow-500 to-orange-600" },
+  "Engineering your future with excellence",
+  "Time to learn, Moment to Celebrate",
+  "Inspiring Faculty, World Class Facility",
+  "A place for learning, discovery, innovation",
 ]
 
 const departments = [
-  "CSE", "IT", "ECE", "EEE", "CIVIL", "MECH", "AIDS", "AIML", "CYBER", "FASHION"
+  { name: "CSE", full: "Computer Science & Engineering", students: 120 },
+  { name: "IT", full: "Information Technology", students: 60 },
+  { name: "ECE", full: "Electronics & Communication", students: 60 },
+  { name: "EEE", full: "Electrical & Electronics", students: 60 },
+  { name: "CIVIL", full: "Civil Engineering", students: 60 },
+  { name: "MECH", full: "Mechanical Engineering", students: 60 },
+  { name: "AIDS", full: "AI & Data Science", students: 60 },
+  { name: "AIML", full: "AI & Machine Learning", students: 60 },
+  { name: "CYBER", full: "Cyber Security", students: 40 },
+  { name: "FASHION", full: "Fashion Technology", students: 40 },
 ]
 
-function AnimatedText({ text, className, delay = 0 }) {
-  return (
-    <span className={className}>
-      {text.split('').map((char, i) => (
-        <motion.span
-          key={i}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: delay + i * 0.03, duration: 0.4 }}
-          style={{ display: 'inline-block', minWidth: char === ' ' ? '0.3em' : 'auto' }}
-        >
-          {char === ' ' ? '\u00A0' : char}
-        </motion.span>
-      ))}
-    </span>
-  )
-}
+const facilities = [
+  { icon: "📚", title: "Library", desc: "Excellent library for students and faculty" },
+  { icon: "🚌", title: "Transport", desc: "Buses reach campus before 8:05 AM daily" },
+  { icon: "🏠", title: "Hostel", desc: "Separate hostels for boys and girls" },
+  { icon: "🏆", title: "Sports", desc: "Best sports facilities and coaches" },
+]
 
-function ColorChangingText({ text, className }) {
-  const [colorIndex, setColorIndex] = useState(0)
+const recruiters = ["TCS", "Infosys", "Cognizant", "Wipro", "IBM", "Mahindra"]
+
+function TypingText() {
+  const [idx, setIdx] = useState(0)
+  const [text, setText] = useState('')
+  const [del, setDel] = useState(false)
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setColorIndex((prev) => (prev + 1) % colors.length)
-    }, 2000)
-    return () => clearInterval(interval)
-  }, [])
-
-  return (
-    <motion.span
-      className={className}
-      animate={{ color: colors[colorIndex] }}
-      transition={{ duration: 0.8 }}
-    >
-      {text}
-    </motion.span>
-  )
-}
-
-function TypingEffect({ texts, speed = 100, deleteSpeed = 50, pause = 2000 }) {
-  const [displayText, setDisplayText] = useState('')
-  const [textIndex, setTextIndex] = useState(0)
-  const [isDeleting, setIsDeleting] = useState(false)
-
-  useEffect(() => {
-    const currentText = texts[textIndex]
-
+    const current = quotes[idx]
     const timeout = setTimeout(() => {
-      if (!isDeleting) {
-        setDisplayText(currentText.substring(0, displayText.length + 1))
-        if (displayText.length === currentText.length) {
-          setTimeout(() => setIsDeleting(true), pause)
-        }
+      if (!del) {
+        setText(current.substring(0, text.length + 1))
+        if (text.length === current.length) setTimeout(() => setDel(true), 2500)
       } else {
-        setDisplayText(currentText.substring(0, displayText.length - 1))
-        if (displayText.length === 0) {
-          setIsDeleting(false)
-          setTextIndex((prev) => (prev + 1) % texts.length)
-        }
+        setText(current.substring(0, text.length - 1))
+        if (text.length === 0) { setDel(false); setIdx((i) => (i + 1) % quotes.length) }
       }
-    }, isDeleting ? deleteSpeed : speed)
-
+    }, del ? 40 : 80)
     return () => clearTimeout(timeout)
-  }, [displayText, isDeleting, textIndex, texts, speed, deleteSpeed, pause])
+  }, [text, del, idx])
 
-  return (
-    <span>
-      {displayText}
-      <motion.span
-        animate={{ opacity: [1, 0] }}
-        transition={{ duration: 0.5, repeat: Infinity }}
-        className="text-white"
-      >
-        |
-      </motion.span>
-    </span>
-  )
+  return <span>{text}<span className="text-indigo animate-pulse">|</span></span>
 }
 
-function ParticleField() {
-  const particles = Array.from({ length: 50 }, (_, i) => ({
-    id: i,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    size: Math.random() * 4 + 1,
-    duration: Math.random() * 10 + 5,
-    delay: Math.random() * 5,
-  }))
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {particles.map((p) => (
-        <motion.div
-          key={p.id}
-          className="absolute rounded-full bg-white/20"
-          style={{
-            left: `${p.x}%`,
-            top: `${p.y}%`,
-            width: p.size,
-            height: p.size,
-          }}
-          animate={{
-            y: [0, -100, 0],
-            x: [0, Math.random() * 60 - 30, 0],
-            opacity: [0, 1, 0],
-          }}
-          transition={{
-            duration: p.duration,
-            repeat: Infinity,
-            delay: p.delay,
-            ease: "easeInOut",
-          }}
-        />
-      ))}
-    </div>
-  )
-}
+const card = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }
 
 export default function Home() {
   const navigate = useNavigate()
-  const [currentQuote, setCurrentQuote] = useState(0)
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentQuote((prev) => (prev + 1) % quotes.length)
-    }, 6000)
-    return () => clearInterval(interval)
-  }, [])
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1, delayChildren: 0.3 }
-    }
-  }
-
-  const itemVariants = {
-    hidden: { y: 30, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { type: 'spring', stiffness: 100, damping: 15 }
-    }
-  }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0, x: -100 }}
-      className="min-h-screen pt-20 pb-0 relative overflow-hidden"
-    >
-      {/* Hero Section with Gradient Background */}
-      <div className="relative min-h-screen gradient-bg flex items-center justify-center">
-        <ParticleField />
+    <motion.div initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: 0.08 } } }} className="flex flex-col gap-5">
 
-        {/* Decorative Elements */}
-        <motion.div
-          className="absolute top-20 left-10 w-72 h-72 bg-white/5 rounded-full blur-3xl"
-          animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        />
-        <motion.div
-          className="absolute bottom-20 right-10 w-96 h-96 bg-white/5 rounded-full blur-3xl"
-          animate={{ scale: [1.2, 1, 1.2], rotate: [360, 180, 0] }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-        />
-
-        <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {/* Badge */}
-            <motion.div
-              variants={itemVariants}
-              className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm px-5 py-2.5 rounded-full text-white mb-8 border border-white/20"
-            >
-              <motion.div
-                animate={{ rotate: [0, 360] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-              >
-                <Sparkles className="w-4 h-4" />
-              </motion.div>
-              <span className="text-sm font-medium tracking-wide">AI-Powered Analytics Platform</span>
-            </motion.div>
-
-            {/* College Name - Main Title */}
-            <motion.div variants={itemVariants} className="mb-4">
-              <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight">
-                <AnimatedText text="SRI KRISHNA" delay={0.2} className="block" />
-              </h1>
-            </motion.div>
-
-            <motion.div variants={itemVariants} className="mb-4">
-              <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight">
-                <ColorChangingText text="ENGINEERING COLLEGE" className="block" />
-              </h1>
-            </motion.div>
-
-            {/* Decorative Line */}
-            <motion.div
-              variants={itemVariants}
-              className="flex items-center justify-center gap-4 my-6"
-            >
-              <motion.div
-                className="h-px bg-gradient-to-r from-transparent via-white to-transparent"
-                initial={{ width: 0 }}
-                animate={{ width: 200 }}
-                transition={{ delay: 1, duration: 1 }}
-              />
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                className="w-12 h-12 border-2 border-white/50 rounded-full flex items-center justify-center"
-              >
-                <GraduationCap className="w-6 h-6 text-white" />
-              </motion.div>
-              <motion.div
-                className="h-px bg-gradient-to-r from-transparent via-white to-transparent"
-                initial={{ width: 0 }}
-                animate={{ width: 200 }}
-                transition={{ delay: 1, duration: 1 }}
-              />
-            </motion.div>
-
-            {/* Sub College Name */}
-            <motion.div variants={itemVariants} className="mb-8">
-              <h2 className="text-lg md:text-2xl lg:text-3xl font-semibold text-white/90 tracking-wide">
-                <AnimatedText text="& SRI KRISHNA INSTITUTE OF TECHNOLOGY" delay={0.8} className="inline" />
-              </h2>
-            </motion.div>
-
-            {/* Animated Quote */}
-            <motion.div
-              variants={itemVariants}
-              className="h-16 flex items-center justify-center mb-10"
-            >
-              <motion.p
-                key={currentQuote}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="text-base md:text-lg text-white/70 italic max-w-2xl"
-              >
-                &ldquo;{quotes[currentQuote]}&rdquo;
-              </motion.p>
-            </motion.div>
-
-            {/* CTA Buttons */}
-            <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center">
-              <motion.button
-                whileHover={{ scale: 1.05, boxShadow: "0 25px 50px rgba(0,0,0,0.3)" }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => navigate('/department')}
-                className="group px-8 py-4 bg-white text-indigo-700 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl transition-all duration-300"
-              >
-                <BookOpen className="w-5 h-5" />
-                Get Started
-                <motion.div
-                  className="group-hover:translate-x-1 transition-transform"
-                >
-                  <ArrowRight className="w-5 h-5" />
-                </motion.div>
-              </motion.button>
-
-              <motion.button
-                whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.25)" }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => navigate('/analytics')}
-                className="px-8 py-4 bg-white/15 text-white rounded-2xl font-bold text-lg border-2 border-white/30 hover:border-white/50 transition-all duration-300 backdrop-blur-sm"
-              >
-                View Dashboard
-              </motion.button>
-            </motion.div>
-
-            {/* Department Ticker */}
-            <motion.div
-              variants={itemVariants}
-              className="mt-16 overflow-hidden"
-            >
-              <p className="text-white/50 text-sm mb-3 uppercase tracking-widest">Departments</p>
-              <div className="flex gap-3 justify-center flex-wrap">
-                {departments.map((dept, index) => (
-                  <motion.span
-                    key={dept}
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 1.5 + index * 0.1 }}
-                    className="px-3 py-1 bg-white/10 rounded-full text-white/80 text-xs font-medium border border-white/10"
-                  >
-                    {dept}
-                  </motion.span>
-                ))}
-              </div>
-            </motion.div>
-          </motion.div>
+      {/* Topbar */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-sora text-[22px] font-semibold text-text-hi">SRI KRISHNA ENGINEERING COLLEGE</h1>
+          <p className="text-[13px] text-text-mid mt-1">& SRI KRISHNA INSTITUTE OF TECHNOLOGY — <TypingText /></p>
         </div>
+        <div className="flex items-center gap-3 text-[12px] text-text-low">
+          <span className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" />+91 81108 61000</span>
+          <span className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5" />principal.skec@gmail.com</span>
+        </div>
+      </div>
 
-        {/* Scroll Indicator */}
-        <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          <ChevronDown className="w-8 h-8 text-white/50" />
+      {/* Stat Cards */}
+      <motion.div variants={card} className="grid grid-cols-4 gap-4">
+        {[
+          { label: "DEPARTMENTS", value: "10", delta: "+2 new", up: true, color: "text-indigo" },
+          { label: "ACADEMIC YEARS", value: "4", delta: "B.E / B.Tech", up: true, color: "text-amber" },
+          { label: "TOTAL STUDENTS", value: "620+", delta: "All departments", up: true, color: "text-green" },
+          { label: "SUCCESS RATE", value: "94%", delta: "↑ 3.1% vs last", up: true, color: "text-green" },
+        ].map((s, i) => (
+          <motion.div key={i} variants={card} whileHover={{ borderColor: "rgba(129,140,248,0.35)", y: -2 }}
+            className="glass p-5 flex flex-col gap-2 transition-all duration-200 cursor-pointer">
+            <span className="text-[11.5px] text-text-mid uppercase tracking-[0.06em] font-medium">{s.label}</span>
+            <span className={`font-mono text-[28px] font-bold ${s.color}`}>{s.value}</span>
+            <span className={`text-[11.5px] font-medium ${s.up ? 'text-green' : 'text-rose'}`}>{s.delta}</span>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Quick Actions */}
+      <motion.div variants={card} className="grid grid-cols-3 gap-4">
+        {[
+          { icon: Building2, title: "Student Management", desc: "Track student data across all departments", action: () => navigate('/department'), color: "from-indigo/20 to-indigo-deep/20" },
+          { icon: BarChart3, title: "Performance Analytics", desc: "AI-powered academic progress insights", action: () => navigate('/analytics'), color: "from-amber/20 to-orange-500/20" },
+          { icon: Award, title: "Grade Analysis", desc: "Comprehensive marks evaluation system", action: () => navigate('/upload'), color: "from-green/20 to-emerald-500/20" },
+        ].map((item, i) => (
+          <motion.div key={i} variants={card} whileHover={{ borderColor: "rgba(129,140,248,0.35)", y: -3 }}
+            className="glass p-6 cursor-pointer transition-all duration-200 group" onClick={item.action}>
+            <div className={`w-12 h-12 rounded-[12px] bg-gradient-to-br ${item.color} flex items-center justify-center mb-4`}>
+              <item.icon className="w-6 h-6 text-indigo" />
+            </div>
+            <h3 className="font-sora text-[15px] font-semibold text-text-hi mb-1.5">{item.title}</h3>
+            <p className="text-[13px] text-text-mid leading-relaxed">{item.desc}</p>
+            <div className="flex items-center gap-1.5 text-[12px] text-indigo mt-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+              Open <ArrowRight className="w-3.5 h-3.5" />
+            </div>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Departments Grid */}
+      <motion.div variants={card} className="glass p-6">
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="font-sora text-[15px] font-semibold text-text-hi">Departments</h2>
+          <span className="text-[11.5px] text-text-low">Anna University Affiliated</span>
+        </div>
+        <div className="grid grid-cols-5 gap-3">
+          {departments.map((dept, i) => (
+            <motion.div key={i} variants={card} whileHover={{ borderColor: "rgba(129,140,248,0.35)", y: -2 }}
+              className="glass p-3 text-center cursor-pointer transition-all duration-200 rounded-[14px]">
+              <div className="w-10 h-10 rounded-[10px] bg-gradient-to-br from-indigo/20 to-indigo-deep/20 flex items-center justify-center mx-auto mb-2">
+                <span className="text-[11px] font-bold text-indigo font-mono">{dept.name}</span>
+              </div>
+              <div className="text-[11px] font-medium text-text-hi leading-tight">{dept.name}</div>
+              <div className="text-[10px] text-text-low mt-1">{dept.students} students</div>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Bottom Row */}
+      <div className="grid grid-cols-2 gap-4">
+        {/* Facilities */}
+        <motion.div variants={card} className="glass p-6">
+          <h2 className="font-sora text-[15px] font-semibold text-text-hi mb-4">Campus Facilities</h2>
+          <div className="grid grid-cols-2 gap-3">
+            {facilities.map((f, i) => (
+              <div key={i} className="flex items-start gap-3 p-3 rounded-[12px] hover:bg-white/[0.03] transition-colors">
+                <span className="text-[20px]">{f.icon}</span>
+                <div>
+                  <div className="text-[13px] font-medium text-text-hi">{f.title}</div>
+                  <div className="text-[11px] text-text-low mt-0.5">{f.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Recruiters */}
+        <motion.div variants={card} className="glass p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-sora text-[15px] font-semibold text-text-hi">Industry Partners</h2>
+            <span className="text-[10.5px] font-semibold px-2.5 py-1 rounded-full bg-green/10 text-green border border-green/25">Top Recruiters</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {recruiters.map((r, i) => (
+              <span key={i} className="px-4 py-2 glass text-[13px] font-medium text-text-mid rounded-[10px] hover:text-text-hi hover:border-[rgba(129,140,248,0.35)] transition-all cursor-pointer">
+                {r}
+              </span>
+            ))}
+          </div>
+          <div className="mt-4 pt-4 border-t border-white/[0.06]">
+            <div className="flex items-center gap-2 text-[12px] text-text-low">
+              <MapPin className="w-3.5 h-3.5" />
+              Panapakkam, Near Padappai, Via - Tambaram, Chennai - 601 301
+            </div>
+          </div>
         </motion.div>
       </div>
 
-      {/* Features Section */}
-      <div className="bg-white py-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <span className="text-primary font-semibold text-sm uppercase tracking-widest">Why Choose Us</span>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mt-3">
-              Powerful Features for
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary"> Academic Excellence</span>
-            </h2>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => {
-              const Icon = feature.icon
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.15 }}
-                  whileHover={{ y: -10, scale: 1.02 }}
-                  className="group p-8 rounded-3xl bg-gradient-to-br from-gray-50 to-white border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300"
-                >
-                  <motion.div
-                    whileHover={{ rotate: 360, scale: 1.1 }}
-                    transition={{ duration: 0.5 }}
-                    className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center mb-6 shadow-lg`}
-                  >
-                    <Icon className="w-8 h-8 text-white" />
-                  </motion.div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-3">{feature.title}</h3>
-                  <p className="text-gray-500 leading-relaxed">{feature.desc}</p>
-                </motion.div>
-              )
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Section */}
-      <div className="gradient-bg py-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="glass-card p-10"
-          >
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              {[
-                { value: "10+", label: "Departments", icon: Building2 },
-                { value: "4", label: "Academic Years", icon: GraduationCap },
-                { value: "1000+", label: "Students", icon: Users },
-                { value: "95%", label: "Success Rate", icon: Award },
-              ].map((stat, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ scale: 0, opacity: 0 }}
-                  whileInView={{ scale: 1, opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.2 + index * 0.15, type: 'spring', stiffness: 200 }}
-                >
-                  <motion.div
-                    className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4"
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                  >
-                    <stat.icon className="w-7 h-7 text-white" />
-                  </motion.div>
-                  <div className="text-4xl font-bold text-white mb-2">{stat.value}</div>
-                  <div className="text-white/70 text-sm">{stat.label}</div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Testimonial / Quote Section */}
-      <div className="bg-gray-50 py-20 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-          >
-            <div className="text-6xl text-primary/30 mb-6">&ldquo;</div>
-            <p className="text-xl md:text-2xl text-gray-700 italic leading-relaxed mb-8">
-              &ldquo;The beautiful thing about learning is that nobody can take it away from you.&rdquo;
-            </p>
-            <div className="flex items-center justify-center gap-3">
-              <div className="h-px w-12 bg-primary" />
-              <span className="text-primary font-semibold">B.B. King</span>
-              <div className="h-px w-12 bg-primary" />
-            </div>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 px-6">
-        <div className="max-w-7xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-          >
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-xl flex items-center justify-center">
-                <GraduationCap className="w-6 h-6 text-white" />
-              </div>
-              <span className="font-bold text-xl">SKEC Dashboard</span>
-            </div>
-            <p className="text-gray-400 mb-4">SRI KRISHNA ENGINEERING COLLEGE & SRI KRISHNA INSTITUTE OF TECHNOLOGY</p>
-            <p className="text-gray-500 text-sm">Student Analytics Dashboard &copy; 2026. All rights reserved.</p>
-          </motion.div>
-        </div>
-      </footer>
+      {/* Get Started CTA */}
+      <motion.div variants={card} className="glass p-8 text-center">
+        <h2 className="font-sora text-[20px] font-semibold text-text-hi mb-2">Start Analyzing Student Performance</h2>
+        <p className="text-[13px] text-text-mid mb-5">Upload marks data and get AI-powered insights instantly</p>
+        <motion.button
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={() => navigate('/department')}
+          className="px-8 py-3 rounded-[12px] font-sora font-semibold text-[14px] text-white transition-all duration-200"
+          style={{ background: 'linear-gradient(135deg, #818cf8, #4f46e5)', boxShadow: '0 0 0 1px rgba(129,140,248,0.4), 0 8px 24px rgba(79,70,229,0.35)' }}
+        >
+          Get Started <ArrowRight className="w-4 h-4 inline ml-1.5" />
+        </motion.button>
+      </motion.div>
     </motion.div>
-  )
-}
-
-function Building2(props) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/>
-      <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/>
-      <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/>
-      <path d="M10 6h4"/>
-      <path d="M10 10h4"/>
-      <path d="M10 14h4"/>
-      <path d="M10 18h4"/>
-    </svg>
   )
 }

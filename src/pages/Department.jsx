@@ -4,16 +4,16 @@ import { useNavigate } from 'react-router-dom'
 import { Building2, ChevronRight, Cpu, Zap, Code, Settings, Brain, Shield, Shirt, GraduationCap } from 'lucide-react'
 
 const departments = [
-  { id: 'cse', name: 'Computer Science & Engineering', short: 'CSE', icon: Cpu, color: 'from-blue-500 to-indigo-600' },
-  { id: 'it', name: 'Information Technology', short: 'IT', icon: Code, color: 'from-purple-500 to-pink-600' },
-  { id: 'ece', name: 'Electronics & Communication', short: 'ECE', icon: Zap, color: 'from-yellow-500 to-orange-600' },
-  { id: 'eee', name: 'Electrical & Electronics', short: 'EEE', icon: Settings, color: 'from-red-500 to-rose-600' },
-  { id: 'civil', name: 'Civil Engineering', short: 'CIVIL', icon: Building2, color: 'from-green-500 to-emerald-600' },
-  { id: 'mech', name: 'Mechanical Engineering', short: 'MECH', icon: Settings, color: 'from-gray-500 to-slate-600' },
-  { id: 'aids', name: 'AI & Data Science', short: 'AIDS', icon: Brain, color: 'from-cyan-500 to-blue-600' },
-  { id: 'aiml', name: 'AI & Machine Learning', short: 'AIML', icon: Brain, color: 'from-violet-500 to-purple-600' },
-  { id: 'cyber', name: 'Cyber Security', short: 'CYBER', icon: Shield, color: 'from-emerald-500 to-teal-600' },
-  { id: 'fashion', name: 'Fashion Technology', short: 'FASHION', icon: Shirt, color: 'from-pink-500 to-rose-600' },
+  { id: 'cse', name: 'Computer Science & Engineering', short: 'CSE', icon: Cpu, color: '#818cf8' },
+  { id: 'it', name: 'Information Technology', short: 'IT', icon: Code, color: '#c084fc' },
+  { id: 'ece', name: 'Electronics & Communication', short: 'ECE', icon: Zap, color: '#fbbf24' },
+  { id: 'eee', name: 'Electrical & Electronics', short: 'EEE', icon: Settings, color: '#f87171' },
+  { id: 'civil', name: 'Civil Engineering', short: 'CIVIL', icon: Building2, color: '#34d399' },
+  { id: 'mech', name: 'Mechanical Engineering', short: 'MECH', icon: Settings, color: '#94a3b8' },
+  { id: 'aids', name: 'AI & Data Science', short: 'AIDS', icon: Brain, color: '#22d3ee' },
+  { id: 'aiml', name: 'AI & Machine Learning', short: 'AIML', icon: Brain, color: '#a78bfa' },
+  { id: 'cyber', name: 'Cyber Security', short: 'CYBER', icon: Shield, color: '#34d399' },
+  { id: 'fashion', name: 'Fashion Technology', short: 'FASHION', icon: Shirt, color: '#f472b6' },
 ]
 
 const years = [
@@ -22,6 +22,8 @@ const years = [
   { id: 3, label: '3rd Year', subtitle: 'Advanced' },
   { id: 4, label: '4th Year', subtitle: 'Final' },
 ]
+
+const card = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }
 
 export default function Department() {
   const navigate = useNavigate()
@@ -37,136 +39,87 @@ export default function Department() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 100 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -100 }}
-      transition={{ type: 'spring', stiffness: 100, damping: 20 }}
-      className="min-h-screen pt-24 pb-12 px-6 gradient-bg"
-    >
-      <div className="max-w-7xl mx-auto">
-        <motion.div
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="text-center mb-12"
-        >
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Select Department & Year
-          </h1>
-          <p className="text-white/80 text-lg">Choose your department and academic year to continue</p>
-        </motion.div>
+    <motion.div initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: 0.06 } } }} className="flex flex-col gap-5">
 
-        <div className="mb-12">
-          <motion.h2
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            className="text-2xl font-bold text-white mb-6 flex items-center gap-3"
-          >
-            <Building2 className="w-6 h-6" />
-            Departments
-          </motion.h2>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            {departments.map((dept, index) => {
-              const Icon = dept.icon
-              const isSelected = selectedDept === dept.id
-              return (
-                <motion.button
-                  key={dept.id}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.05 }}
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setSelectedDept(dept.id)}
-                  className={`relative p-4 rounded-2xl text-left transition-all duration-300 ${
-                    isSelected
-                      ? 'bg-white shadow-2xl ring-4 ring-yellow-400'
-                      : 'bg-white/90 hover:bg-white'
-                  }`}
-                >
-                  <div className={`w-12 h-12 bg-gradient-to-r ${dept.color} rounded-xl flex items-center justify-center mb-3`}>
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="font-bold text-gray-800 text-sm">{dept.short}</h3>
-                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">{dept.name}</p>
-                </motion.button>
-              )
-            })}
-          </div>
-        </div>
-
-        <div className="mb-12">
-          <motion.h2
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="text-2xl font-bold text-white mb-6 flex items-center gap-3"
-          >
-            <GraduationCap className="w-6 h-6" />
-            Academic Year
-          </motion.h2>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {years.map((year, index) => {
-              const isSelected = selectedYear === year.id
-              return (
-                <motion.button
-                  key={year.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 + index * 0.1 }}
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setSelectedYear(year.id)}
-                  className={`relative p-6 rounded-2xl text-center transition-all duration-300 ${
-                    isSelected
-                      ? 'bg-white shadow-2xl ring-4 ring-green-400'
-                      : 'bg-white/90 hover:bg-white'
-                  }`}
-                >
-                  <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-2">
-                    {year.id}
-                  </div>
-                  <h3 className="font-bold text-gray-800">{year.label}</h3>
-                  <p className="text-sm text-gray-500">{year.subtitle}</p>
-                </motion.button>
-              )
-            })}
-          </div>
-        </div>
-
-        <AnimatePresence>
-          {selectedDept && selectedYear && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="glass-card p-6 max-w-2xl mx-auto"
-            >
-              <div className="flex items-center justify-between flex-wrap gap-4">
-                <div>
-                  <h3 className="text-lg font-bold text-gray-800">Selection Summary</h3>
-                  <p className="text-gray-600">
-                    <span className="font-semibold">{departments.find(d => d.id === selectedDept)?.name}</span>
-                    {' \u2022 '}
-                    <span className="font-semibold">{years.find(y => y.id === selectedYear)?.label}</span>
-                  </p>
-                </div>
-                <motion.button
-                  whileHover={{ scale: 1.05, x: 5 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={handleProceed}
-                  className="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-bold flex items-center gap-2 shadow-lg"
-                >
-                  Continue
-                  <ChevronRight className="w-5 h-5" />
-                </motion.button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+      <div>
+        <h1 className="font-sora text-[22px] font-semibold text-text-hi">Select Department & Year</h1>
+        <p className="text-[13px] text-text-mid mt-1">Choose your department and academic year to continue</p>
       </div>
+
+      {/* Departments */}
+      <motion.div variants={card}>
+        <h2 className="text-[13px] text-text-mid uppercase tracking-widest font-medium mb-3 flex items-center gap-2">
+          <Building2 className="w-4 h-4" /> Departments
+        </h2>
+        <div className="grid grid-cols-5 gap-3">
+          {departments.map((dept, index) => {
+            const Icon = dept.icon
+            const isSelected = selectedDept === dept.id
+            return (
+              <motion.button key={dept.id} variants={card}
+                whileHover={{ borderColor: `${dept.color}60`, y: -3 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => setSelectedDept(dept.id)}
+                className={`glass p-4 text-left transition-all duration-200 cursor-pointer ${isSelected ? 'border-2' : ''}`}
+                style={isSelected ? { borderColor: dept.color, boxShadow: `0 0 20px ${dept.color}20` } : {}}
+              >
+                <div className="w-10 h-10 rounded-[10px] flex items-center justify-center mb-3" style={{ background: `${dept.color}20` }}>
+                  <Icon className="w-5 h-5" style={{ color: dept.color }} />
+                </div>
+                <div className="text-[13px] font-semibold text-text-hi">{dept.short}</div>
+                <div className="text-[10.5px] text-text-low mt-0.5 line-clamp-2">{dept.name}</div>
+              </motion.button>
+            )
+          })}
+        </div>
+      </motion.div>
+
+      {/* Years */}
+      <motion.div variants={card}>
+        <h2 className="text-[13px] text-text-mid uppercase tracking-widest font-medium mb-3 flex items-center gap-2">
+          <GraduationCap className="w-4 h-4" /> Academic Year
+        </h2>
+        <div className="grid grid-cols-4 gap-3">
+          {years.map((year) => {
+            const isSelected = selectedYear === year.id
+            return (
+              <motion.button key={year.id} variants={card}
+                whileHover={{ borderColor: "rgba(129,140,248,0.35)", y: -3 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => setSelectedYear(year.id)}
+                className={`glass p-5 text-center transition-all duration-200 cursor-pointer ${isSelected ? 'border-2 border-indigo' : ''}`}
+                style={isSelected ? { boxShadow: '0 0 20px rgba(129,140,248,0.15)' } : {}}
+              >
+                <div className="text-[32px] font-bold font-mono text-indigo mb-1">{year.id}</div>
+                <div className="text-[13px] font-semibold text-text-hi">{year.label}</div>
+                <div className="text-[11px] text-text-low mt-0.5">{year.subtitle}</div>
+              </motion.button>
+            )
+          })}
+        </div>
+      </motion.div>
+
+      {/* Summary */}
+      <AnimatePresence>
+        {selectedDept && selectedYear && (
+          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 15 }}
+            className="glass p-5 flex items-center justify-between">
+            <div>
+              <div className="text-[14px] font-semibold text-text-hi">Selection Summary</div>
+              <div className="text-[13px] text-text-mid mt-1">
+                <span className="text-indigo">{departments.find(d => d.id === selectedDept)?.name}</span>
+                {' · '}
+                <span className="text-amber">{years.find(y => y.id === selectedYear)?.label}</span>
+              </div>
+            </div>
+            <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={handleProceed}
+              className="flex items-center gap-2 px-6 py-2.5 rounded-[12px] font-semibold text-[13px] text-white transition-all"
+              style={{ background: 'linear-gradient(135deg, #818cf8, #4f46e5)', boxShadow: '0 0 0 1px rgba(129,140,248,0.4), 0 6px 18px rgba(79,70,229,0.35)' }}>
+              Continue <ChevronRight className="w-4 h-4" />
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }

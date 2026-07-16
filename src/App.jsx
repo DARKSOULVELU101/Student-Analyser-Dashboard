@@ -4,7 +4,7 @@ import Home from './pages/Home'
 import Department from './pages/Department'
 import Upload from './pages/Upload'
 import Analytics from './pages/Analytics'
-import Navbar from './components/Navbar'
+import Sidebar from './components/Sidebar'
 
 function AnimatedRoutes() {
   const location = useLocation()
@@ -23,9 +23,11 @@ function AnimatedRoutes() {
 function App() {
   return (
     <Router>
-      <div className="min-h-screen">
-        <Navbar />
-        <AnimatedRoutes />
+      <div className="flex min-h-screen p-6 gap-6 max-w-[1400px] mx-auto">
+        <Sidebar />
+        <main className="flex-1 flex flex-col gap-5 min-w-0">
+          <AnimatedRoutes />
+        </main>
       </div>
     </Router>
   )
